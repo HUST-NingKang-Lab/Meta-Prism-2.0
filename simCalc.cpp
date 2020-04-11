@@ -209,13 +209,13 @@ compareResult* matrixCompare( class loader & A){
     int x,i,j;
     result=new compareResult;
     x=result->x=result->y=A.size();
-    result->dataAlloc(x,x,true);
+    result->dataAlloc(x,x);result->symmetry=true;
     A.genName();
     cout<<"calculating "<<x<<'*'<<x<<" similarity matrix\n";
     pBar=new progressBar;
     pBar->init(x*x/2);
     auto begin=clock();
-    int m=0;auto iterI=A.getData().begin();
+    int m=0;auto iterI=A.Data.begin();
     for(i=0;i<x;i++){
         
         result->data[i][i]=1;
@@ -239,10 +239,10 @@ compareResult* matrixCompare( class loader & A){
 }
 void *lineCompare(void * args){
     LineCompareArg * arg=(LineCompareArg*)args;
-    auto iter=arg->A->getData().begin();
+    auto iter=arg->A->Data.begin();
     for(int i=0;i<arg->id;i++){
         iter++;
-        if(iter==arg->A->getData().end())
+        if(iter==arg->A->Data.end())
             return NULL;
     }
     for(int i=arg->id;i<arg->number;i+=arg->core){
@@ -252,8 +252,9 @@ void *lineCompare(void * args){
             boost->convert(*(arg->A),i+1);
             //boost->genCompareData();
             auto bResult=boost->calc();
+            arg->result->data[i][0]=1;
             for(int j=i+1;j<arg->number;j++){
-                arg->result->data[i][j]=bResult[j-i-1];
+                arg->result->data[i][j-i]=bResult[j-i-1];
             }
             delete boost;
         }
@@ -261,7 +262,7 @@ void *lineCompare(void * args){
             ;
         }
         for(int j=0;j<arg->core;j++){
-            if(iter!=arg->A->getData().end())
+            if(iter!=arg->A->Data.end())
                 iter++;
             else
                 return NULL;
@@ -299,21 +300,21 @@ compareResult* matrixBoostCompare( class loader & A,int core){
         delete []tids;delete []args;
     }
     else{
-        int m=0;auto iterI=A.getData().begin();
+        int m=0;auto iterI=A.Data.begin();
         for(i=0;i<x;i++,iterI++){
             boost=new booster(A.p);
             if(iterI->second->data.size()==0)
                 continue;
             boost->setData(iterI->second);
             boost->convert(A,i+1);
-            //boost->genCompareData();
             auto bResult=boost->calc();
             for(j=i+1;j<x;j++){
                 m+=1;
                 if(m%20==0)
                     pBar->show(m);
                 //cout<<i<<' '<<j<<endl;
-                result->data[i][j]=bResult[j-i-1];
+                auto Var=bResult[j-i-1];
+                result->data[i][j-i]=bResult[j-i-1];
                 
             }
             delete bResult;
@@ -332,14 +333,14 @@ compareResult* searchCompare( class loader &A,  class loader &B, int core){
     x=result->x=A.size();
     y=result->y=B.size();
     cout<<"calculating "<<x<<'*'<<y<<" searching\n";
-    result->dataAlloc(x, y,false);
+    result->dataAlloc(x, y);
     A.genName();B.genName();
     pb.init(x*y/2);
     int m=0;
     auto begin=clock();
-    auto iterI=A.getData().begin();
+    auto iterI=A.Data.begin();
     for(i=0;i<x;i++){
-        auto iterJ=B.getData().begin();
+        auto iterJ=B.Data.begin();
         for(j=0;j<y;j++){
             m+=1;
             if(m%20==0)

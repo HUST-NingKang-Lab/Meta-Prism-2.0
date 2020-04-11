@@ -145,20 +145,14 @@ public:
 class progressBar{
 public:
     float value,all,percent;
-    bool inited=false;
     int print=0;
     void init(int a){
         value=0;all=a;
         percent=100*value/all;
         cout<<endl;
-        inited=true;
         cout<<"percents:"<<flush;
     }
     void show(int a){
-        if(inited==false){
-            cout<<"Error, progress bar not inited"<<endl;
-            exit(0);
-    }
         value=a;
         percent=100*value/all;
         while(percent>print){

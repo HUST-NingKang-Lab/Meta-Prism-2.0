@@ -14,22 +14,25 @@
 using namespace std;
 class loader{
 private:
+    vector<sampleData> data;
+    
     CompData compData;
-    map<string, sampleData*> Data;
+    
     
 public:
-    
+    map<string, sampleData*> Data;
     vector<string> names;
     parser *p;
     loader(parser *p){this->p=p;}
     int loadMultiData(ifstream &ifile);
+    const vector<sampleData>& getData(){return data;}
     int loadCompData(ifstream &ifile);
     sampleData* loadTSVFile(ifstream &ifile,string name="not defined");
     int loadMultiTSV(ifstream &ifile);
     int outputMirror(ofstream &ofile);
     int loadFromMirror(ifstream &ifile);
     int outTSVTable(ofstream &ofile);
-    int size(){return (int)Data.size();}
+    int size(){return Data.size();}
     void genName(){
         names.clear();
         for(auto iter=Data.begin();iter!=Data.end();iter++)
@@ -37,7 +40,6 @@ public:
         return;
     }
     int printToTable(ofstream &ofile);
-    const map<string,sampleData*> & getData(){return Data;}
     //int out
 };
 #endif /* loader_hpp */

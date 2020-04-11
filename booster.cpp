@@ -11,14 +11,14 @@ int booster::treeWalk(const TreeNode *a, int id, float coefficient){
     int thisId=a->id;
     bool sim=false;
     //const Table* compareTable=p->getTable();
-    sim=(table.at(thisId).select);
+    sim=(table[thisId].select);
     if(sim){
         id=thisId;
         coefficient=1;
     }
     else{
-        table.at(thisId).targetID=id;
-        table.at(thisId).coef=coefficient;
+        table[thisId].targetID=id;
+        table[thisId].coef=coefficient;
     }
     if(a->lChild==nullptr){
         ;
@@ -35,16 +35,15 @@ int booster::setData(sampleData *A){
     int id;
     data=A;
     const Table* compareTable=p->getTable();
-    table.resize(p->getTreeSize());
+    table=new boostTable[p->getTreeSize()];
     for(int i=0;i<p->getTreeSize();i++)
         table[i].select=false;
     for(auto iter=A->data.begin();iter!=A->data.end();iter++){
         id=iter->ID;
-        while(id>=0&&table.at(id).select==false){
-            auto element=table.at(id);
-            element.targetID=id;
-            element.coef=1;
-            element.select=true;
+        while(id>=0&&table[id].select==false){
+            table[id].targetID=id;
+            table[id].coef=1;
+            table[id].select=true;
             id=compareTable[id].fid;
             elementNumber++;
         }
@@ -59,7 +58,7 @@ void booster::genCompareData(){
     int alloc=1;
     genWalk(p->getTree(), alloc);
     for(int i=0;i<p->getTreeSize();i++){
-        if(table.at(i).select==false)
+        if(table[i].select==false)
             table[i].targetID=table[table[i].targetID].targetID;
         //cout<<i<<' '<<table[i].targetID<<' '<<table[i].coef<<endl;
     }
@@ -73,12 +72,13 @@ void booster::genCompareData(){
         //cout<<writeBuff[i].order_1<<' '<<writeBuff[i].order_2<<' '<<writeBuff[i].order_N<<'\n';
     }
     orderSize=(int)writeBuff.size();
+    
     return;
 }
 int booster::genWalk(const TreeNode *a, int &alloc){
     CompElement buf;int id;
     if(a->lChild!=nullptr){
-        if(table.at(a->lChild->id).select)
+        if(table[a->lChild->id].select)
             buf.order_1=genWalk(a->lChild, alloc);
         else buf.order_1=0;
         if(table[a->rChild->id].select)
@@ -94,7 +94,7 @@ int booster::genWalk(const TreeNode *a, int &alloc){
     else{
         id=alloc++;
     }
-    table.at(a->id).targetID=id;
+    table[a->id].targetID=id;
     return id;
 }
 int booster::convert(loader &A,int begin,int end){
@@ -111,21 +111,22 @@ int booster::convert(loader &A,int begin,int end){
     }
     int targetID;float val;
     int i=0,j;
-    auto iter=A.getData().begin();
+    auto iter=A.Data.begin();
     for(j=0;j<begin;j++)
         iter++;
     for(;j<end;j++,iter++,i++){
         auto &data=iter->second->data;
         for(auto dataIter=data.begin();dataIter!=data.end();dataIter++){
-            targetID=table.at(dataIter->ID).targetID;
-            val=table.at(dataIter->ID).coef*dataIter->data;
+            targetID=table[dataIter->ID].targetID;
+            val=table[dataIter->ID].coef*dataIter->data;
             matrix[targetID][i]+=val;
         }
+        
     }
     auto &sourceData=this->data->data;
     for(auto dataIter=sourceData.begin();dataIter!=sourceData.end();dataIter++){
-        targetID=table.at(dataIter->ID).targetID;
-        val=table.at(dataIter->ID).coef*dataIter->data;
+        targetID=table[dataIter->ID].targetID;
+        val=table[dataIter->ID].coef*dataIter->data;
         for(int j=0;j<sampleSize;j++)
             source[targetID][j]+=val;
     }

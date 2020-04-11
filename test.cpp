@@ -30,7 +30,7 @@ int main(int argc, const char * argv[]) {
     bool helpFlag=false;
     compareResult* result;
     string buffer,pathTree,pathLoad,pathSample,pathOut,pathSave,pathConvert,pathOutTree;
-    int loadStatus=-1,actionStatus=-1,
+    int loadStatus=-1,sampleStatus=-1,actionStatus=-1,
     outStatus=-1,saveStatus=-1,convertStatus=-1,outTreeStatus=-1;
     parser *p = nullptr;loader *database,*sample;
     cout << "Welcome to using meta-prism 2.0\n";

@@ -26,7 +26,7 @@ protected:
     parser * p;
     sampleData *data;
     float **matrix,**source;
-    vector<boostTable> table;
+    boostTable *table;
     int treeWalk(const TreeNode* a,int id,float coefficient);
     CompData compareData;
     int elementNumber,sampleSize,orderSize;
@@ -43,6 +43,7 @@ public:
     int setData(sampleData *A);
     ~booster(){
         
+        delete table;
         delete matrix[0];delete source[0];
         delete matrix;delete source;
     }

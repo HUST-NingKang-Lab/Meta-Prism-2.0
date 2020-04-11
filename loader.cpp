@@ -68,7 +68,7 @@ int getID(const string &A,const unordered_map<string, int> &lable){
             if(finder!=lable.end())
                 return finder->second;
         }
-        for(i=(int)level.size()-1;i>=0;i--){
+        for(i=level.size()-1;i>=0;i--){
             if(level[i].size()<1)
                 continue;
             auto finder=lable.find(level[i]);
@@ -245,7 +245,7 @@ int loader::loadFromMirror(ifstream &ifile){
                 replace(buffer.begin(),buffer.end(),',',' ');buf.clear();
                 buf.str(buffer);
                 buf>>num;
-                //data->data.resize(num);
+                data->data.resize(num);
                 for(i=0;i<num;i++){
                     buf>>abdBuf.ID;
                     buf>>abdBuf.data;
@@ -306,7 +306,7 @@ int loader::printToTable(ofstream &ofile){
         i++;
     }
     progressBar A;
-    A.init((int)names.size());
+    A.init(names.size());
     for(i=0;i<names.size();i++){
         if(i%10==0)
             A.show(i);

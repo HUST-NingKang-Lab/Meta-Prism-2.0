@@ -107,9 +107,9 @@ void parser::nameTravel(TreeNode &node, int &ID) {//SILVA newick tree
         if(name[0]=='\'')// incase there is \' at begin or end of name
             begin=1;
         if(name[name.length()-1]=='\'')
-            end=(int)name.length()-1;
+            end=name.length()-1;
         else
-            end=(int)name.length();
+            end=name.length();
          node.name=name.substr(begin,end-begin);
        
         
