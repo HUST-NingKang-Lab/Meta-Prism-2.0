@@ -19,7 +19,7 @@ void printHelp(){
     <<"--package_search(-ps) + [package path]: search multi samples\n"
     <<"--output(-o) [path]: path to output calculation result\n"
     <<"--save(-s) [path]: save package of loaded file\n"
-    // <<"--convert [path]: save package of loaded file\n"
+    // <<"--convertOTU [path]: save as OTU format\n"
     // <<"--outTree [path]: save package of loaded file\n"
     <<"--cores(-c)+ [cpu core number]:default single core\t--help(-h) help\n";
 }
@@ -27,13 +27,14 @@ int main(int argc, const char * argv[]) {
     // insert code here...
     int i,cores=-1;
     ifstream ifile1,ifile2;ofstream ofile1,ofile2;
-    bool helpFlag=false;
+    bool helpFlag=false,testFlag=false;
     compareResult* result;
     string buffer,pathTree,pathLoad,pathSample,pathOut,pathSave,pathConvert,pathOutTree;
     int loadStatus=-1,sampleStatus=-1,actionStatus=-1,
     outStatus=-1,saveStatus=-1,convertStatus=-1,outTreeStatus=-1;
     parser *p = nullptr;loader *database,*sample;
     cout << "Welcome to using meta-prism 2.0\n";
+    clock_t startTime,finishTime;
     for(i=1;i<argc;i++){
         buffer=argv[i];
         if(buffer=="-t"||buffer=="--tree"){
@@ -109,7 +110,7 @@ int main(int argc, const char * argv[]) {
                 buffer=argv[++i];
                 cores=stoi(buffer);
             }
-        }else if(buffer=="--convert"){
+        }else if(buffer=="--convertOTU"){//convert to OTU
             convertStatus=1;
             pathConvert=argv[++i];
         }
@@ -119,6 +120,8 @@ int main(int argc, const char * argv[]) {
         }
         else if(buffer=="-h"||buffer=="--help")
             helpFlag=true;
+        else if(buffer=="--test")
+            testFlag=true;
         buffer.clear();
     }
     if(i==1 || helpFlag){
@@ -145,6 +148,8 @@ int main(int argc, const char * argv[]) {
         cout<<"Error, not defined database path\n";
         return 0;
     }else{
+        if(testFlag)
+            startTime=clock();
         ifile1.open(pathLoad);
         database=new loader(p);
         cout<<"loading from "<<pathLoad<<endl;
@@ -159,6 +164,10 @@ int main(int argc, const char * argv[]) {
                 break;
         }
         ifile1.close();
+        if(testFlag){
+            finishTime=clock();
+            cout<<"load use"<<(double)(finishTime-startTime)/CLOCKS_PER_SEC<<endl;
+        }
     }
     if(saveStatus==1){
         ofile1.open(pathSave);
@@ -197,13 +206,16 @@ int main(int argc, const char * argv[]) {
         }
     }
     if(outStatus==1){
+        if(testFlag)
+            cout<<"skip save step"<<endl;
+        else{
         ofile1.open(pathOut);
         if(result==nullptr)
             cout<<"Error\n";
         else{
             cout<<"Saving calculation result to: "<<pathOut<<endl;
             result->save(ofile1);}
-        ofile1.close();
+            ofile1.close();}
     }if(convertStatus==1){
         ofile1.open(pathConvert);
             cout<<"Converting data to: "<<pathConvert<<endl;
