@@ -29,9 +29,10 @@ int main(int argc, const char * argv[]) {
     ifstream ifile1,ifile2;ofstream ofile1,ofile2;
     bool helpFlag=false,testFlag=false;
     compareResult* result;
-    string buffer,pathTree,pathLoad,pathSample,pathOut,pathSave,pathConvert,pathOutTree;
+    string buffer,pathTree,pathLoad,pathSample,pathOut,pathSave,pathConvert,pathOutTree,pathOutOrder;
     int loadStatus=-1,sampleStatus=-1,actionStatus=-1,
-    outStatus=-1,saveStatus=-1,convertStatus=-1,outTreeStatus=-1;
+    outStatus=-1,saveStatus=-1,convertStatus=-1,outTreeStatus=-1,
+    outOrderStatus=-1;
     parser *p = nullptr;loader *database,*sample;
     cout << "Welcome to using meta-prism 2.0\n";
     clock_t startTime,finishTime;
@@ -118,6 +119,10 @@ int main(int argc, const char * argv[]) {
             outTreeStatus=1;
             pathOutTree=argv[++i];
         }
+        else if(buffer=="--printOrder"){
+            outOrderStatus=1;
+            pathOutOrder=argv[++i];
+        }
         else if(buffer=="-h"||buffer=="--help")
             helpFlag=true;
         else if(buffer=="--test")
@@ -176,7 +181,7 @@ int main(int argc, const char * argv[]) {
         ofile1.close();
     }
     if(actionStatus==-1){
-        if(saveStatus==-1&&convertStatus==-1&&outTreeStatus==-1)
+        if(saveStatus==-1&&convertStatus==-1&&outTreeStatus==-1&&outOrderStatus==-1)
         {
             cout<<"Nothing to do\n";
             return 0;
@@ -225,6 +230,12 @@ int main(int argc, const char * argv[]) {
     if(outTreeStatus==1){
         ofile1.open(pathOutTree);
         p->printTree(ofile1);
+        ofile1.close();
+    }
+    if(outOrderStatus==1){
+        ofile1.open(pathOutOrder);
+        p->genCompData();
+        p->printCompData(ofile1);
         ofile1.close();
     }
     return 0;
