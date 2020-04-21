@@ -203,7 +203,7 @@ int parser::orderTravel(TreeNode& node,int &step,unordered_map<int, int>& REG){
             break;
         }
     }
-    compData.order_N[step]=i-depth;
+    compData.order_N[step]=node.id;
     compData.dist_1[step]=node.lDist;
     compData.dist_2[step]=node.rDist;
     step++;
@@ -211,7 +211,7 @@ int parser::orderTravel(TreeNode& node,int &step,unordered_map<int, int>& REG){
         REG.erase(REG.find(leftID+depth));
     if (rightID<0)
         REG.erase(REG.find(rightID+depth));
-    return i-depth;
+    return node.id;
 }
 void parser::genCompData(){
     compData.order_1=new int[leafNumber];
