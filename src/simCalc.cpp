@@ -15,6 +15,9 @@ struct state{
 struct twoValue{
     float lABD,rABD;
 };
+bool i_v_cmp(const index_value& a,const index_value& b){
+    return a.value>b.value;
+}
 progressBar *pBar;
 void calcOne(unordered_map<int,state> stateDic,multimap<int,int> toDo);
 float sparseSimCalcPair(const sampleData &a,const sampleData &b,const Table* table){
@@ -239,13 +242,17 @@ compareResult* matrixCompare( class loader & A){
 }
 void *lineCompare(void * args){
     LineCompareArg * arg=(LineCompareArg*)args;
-    auto iter=arg->A->Data.begin();
+    
+    if(arg->B==NULL)
+        arg->B=arg->A;
+    int size=arg->B->size();
+    auto iter=arg->B->Data.begin();
     for(int i=0;i<arg->id;i++){
         iter++;
-        if(iter==arg->A->Data.end())
+        if(iter==arg->B->Data.end())
             return NULL;
     }
-    for(int i=arg->id;i<arg->number;i+=arg->core){
+    for(int i=arg->id;i<size;i+=arg->core){
         if(arg->B==NULL){//matrix
             auto boost=new booster(arg->A->p);
             boost->setData(iter->second);
@@ -253,16 +260,37 @@ void *lineCompare(void * args){
             //boost->genCompareData();
             auto bResult=boost->calc();
             arg->result->data[i][0]=1;
-            for(int j=i+1;j<arg->number;j++){
+            for(int j=i+1;j<size;j++){
                 arg->result->data[i][j-i]=bResult[j-i-1];
             }
+            delete bResult;
             delete boost;
         }
-        else{// X->Y
-            ;
+        else{
+            int m=0,j,topN=arg->number;
+            int x=arg->A->size();int y=arg->B->size();
+            auto boost=new booster(arg->A->p);
+            searchResult* result=(searchResult*)arg->result;
+            if(iter->second->data.size()==0){
+                delete boost;
+                continue;}
+            boost->setData(iter->second);
+            boost->convert(*(arg->A));
+            auto bResult=boost->calc();
+            vector<struct index_value> datas;
+            datas.resize(x);
+            for(j=0;j<x;j++){
+                datas[j].index=j;
+                datas[j].value=bResult[j];
+            }
+            partial_sort(datas.begin(), datas.begin()+topN, datas.end(),i_v_cmp);
+            for(j=0;j<topN;j++)
+                result->data[i][j]=datas[j];
+            delete boost;
+            delete bResult;
         }
         for(int j=0;j<arg->core;j++){
-            if(iter!=arg->A->Data.end())
+            if(iter!=arg->B->Data.end())
                 iter++;
             else
                 return NULL;
@@ -354,5 +382,64 @@ compareResult* searchCompare( class loader &A,  class loader &B, int core){
     result->nameB=B.names;
     
     cout << "using "<<(clock() - begin) * 1.0 / CLOCKS_PER_SEC<<endl;
+    return result;
+}
+
+searchResult* searchBoostCompare(class loader &A,class loader &B,int core,int topN){
+    searchResult*result;
+    booster * boost;
+    int x,y,i,j;
+    if(core <1){
+        cout<<"Warning, CPU cores must >=1, we except you select 1\n";
+        core=1;}
+    result=new searchResult;
+    x=A.size();y=B.size();
+    result->dataAlloc(B.size(),topN);
+    A.genName();
+    cout<<"calculating "<<x<<'*'<<x<<" similarity matrix\n";
+    pBar=new progressBar;
+    pBar->init(x*x/2);auto begin=clock();
+    if(core >1){
+        pthread_t * tids;
+        LineCompareArg * args;
+        tids=new pthread_t[core];
+        args=new LineCompareArg[core];
+        for(int i=0;i<core;i++){
+            args[i].A=&A;args[i].B=&B;args[i].core=core;
+            args[i].id=i;args[i].result=(compareResult*)result;args[i].number=topN;
+            pthread_create(&(tids[i]), NULL, lineCompare, (void*)&(args[i]));
+        }
+        for(int i=0;i<core;i++)
+            pthread_join(tids[i], NULL);
+        delete []tids;delete []args;
+    }
+    else{
+        int m=0;auto iterI=B.Data.begin();
+        for(i=0;i<y;i++,iterI++){
+            boost=new booster(A.p);
+            if(iterI->second->data.size()==0)
+                continue;
+            boost->setData(iterI->second);
+            boost->convert(A);
+            auto bResult=boost->calc();
+            vector<struct index_value> datas;
+            datas.resize(x);
+            for(j=0;j<x;j++){
+                m+=1;
+                if(m%20==0)
+                    pBar->show(m);
+                //cout<<i<<' '<<j<<endl;
+                datas[j].index=j;
+                datas[j].value=bResult[j];
+            }
+            partial_sort(datas.begin(), datas.begin()+topN, datas.end(),i_v_cmp);
+            for(j=0;j<topN;j++)
+                result->data[i][j]=datas[j];
+            delete bResult;
+            delete boost;
+            
+        }}
+    cout << "using "<< (clock() - begin) * 1.0 / CLOCKS_PER_SEC<<endl;
+    //result->nameA=A.names;
     return result;
 }
