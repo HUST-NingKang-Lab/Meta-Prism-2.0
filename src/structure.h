@@ -53,6 +53,11 @@ struct CompData{
         delete []dist_2;delete []dist_1;delete []order_N;delete []order_2;delete []order_1;
     }
 };
+struct index_value{
+    unsigned short int index;
+    float value;
+    
+};
 struct waitElement{
     int dep,id;
 };
@@ -167,5 +172,22 @@ public:
         }
     }
 };
-
+class searchResult{
+public:
+    int x,topN;
+    index_value **data;
+    int dataAlloc(int x,int topN){
+        data=new index_value*[x];
+        this->x=x;
+        this->topN=topN;
+        data[0]=new index_value[x*topN];
+        for(int i=1;i<x;i++)
+            data[i]=data[i-1]+topN;
+        return 0;
+        }
+    ~searchResult(){
+        delete [] data[0];
+        delete [] data;
+    }
+};
 #endif /* structure_h */

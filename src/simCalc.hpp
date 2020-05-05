@@ -29,4 +29,5 @@ void *lineCompare(void * args);
 compareResult* matrixCompare( loader & A);
 compareResult* matrixBoostCompare( loader & A,int core=1);
 compareResult* searchCompare( loader &A,  loader &B,int core=1);
+searchResult* searchBoostCompare(class loader &A,class loader &B,int core,int topN);
 #endif /* sparse_sim_calc_hpp */
