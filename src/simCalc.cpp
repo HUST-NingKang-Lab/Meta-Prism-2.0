@@ -253,7 +253,7 @@ void *lineCompare(void * args){
             return NULL;
     }
     for(int i=arg->id;i<size;i+=arg->core){
-        if(arg->B==NULL){//matrix
+        if(arg->B==arg->A){//matrix
             auto boost=new booster(arg->A->p);
             boost->setData(iter->second);
             boost->convert(*(arg->A),i+1);
