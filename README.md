@@ -2,18 +2,63 @@
 #Meta-Prism/2
 # Meta-Prism 2.0
 ## Introduction
-Pass
+Meta prism 2.0 is a faster microbiome sample comparison and search software. It default use [Silva phylogeny tree](https://www.arb-silva.de) and support [EBI MGNify data](https://www.ebi.ac.uk/metagenomics/). It also supports custom sequencing evolutionary trees. It can calculate the similarity matrix of microbiome samples and search the microbiome database. Because of the improvement of calculation performance compared with [Meta-Prism 1.0](https://github.com/HUST-NingKang-Lab/metaPrism), 2.0 doesn’t need index system and execute exhaustive search.
 ## Requirement
 Our project require gcc 4.8.5 or higher. And we successfully compiled on CentOS 7.6 and macOS 10.15
 ## Install and Build
 ### Use git clone to download the source code:
-Pass
+`git clone https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0.git`
 ### Build the software:
 `make`
 ### Uninstall the software:
 `make clean`
 ## Usage
-Meta-Prism 2.0
+### Prepare phylogeny tree:
+Meta prism 2.0 needs the evolutionary tree of Newick format as the basis of calculation. It is recommended to use Silva evolutionary tree, or set the evolutionary tree according to the sequencing results or use requirements. Use`  -t [path]` or `--tree [path] ` to select the evolutionary tree path.
+### Load data:
+Meta prism 2.0 supports SSU abundance data files in EBI MGNify and other databases as input, and provides special packaged data format ". pdata" to store abundance more efficiently. Note that pdata format data is bound to the specific evolution tree.
+#### Load TSV data:
+Prepare the TSV data path list file, and use the arg  ` --load_from_list [path]`  or `-ll [path]` reads all TSV data in the list.
+#### Load packaged data:
+Use arg `--load_from_package [path]` or `-lp [path] ` to load all samples in this packaged file.
+### Package data:
+Meta prism 2.0 can package the data in TSV file to ". pdata" file for more efficient storage. The operation is as follows:
+`./bin/Meta-Prism2.0 --tree [TreePath] -ll [FileListPath] --save(-s) [PdataFileOutputPath]`
+Note that the generated ". pdata" data file is bound to the evolution tree and cannot be used on another evolution tree.
+### Calculate similarity matrix:
+Meta prism 2.0 can load the data of microbiome samples and calculate the similarity matrix between samples. Relevant args are:
+```
+--load_from_list(-ll) [FileListPath] load data from files in path list
+--load_from_package(-lp) [PdataListPath] load data from packaged pdata file(mutually exclusive with the former)
+--cores(-c) [CoreNumber=1] core usage, default is 1
+--output(-o) [ResultOutputPath] result output path
+```
+
+For example:
+`./bin/Meta-Prism2.0 --tree [TreePath] -ll [FileListPath] -m -o [ResultPath]`
+You can read all the sample file paths contained in the list file corresponding to filelistpath, calculate the similarity matrix, and finally output it to resultpath.
+### Database search:
+Meta prism 2.0 can search one or more microbial samples for another group of microbial samples, and return the top n sample name with the highest similarity and similarity. Relevant args are:
+```
+--single_search(-ss) [FilePath] [TopN] load data from a single sample file and returns TopN most similar results. TopN is optional, default is 5
+--multi_search(-ms) [FileListPath] [TopN] load data from sample file lists
+--package_search(-ps) [PdataListPath] [TopN] load data from packaged file（Mutually exclusive with the first two）
+--cores(-c) [CoreNumber=1] core usage, default is 1
+--output(-o) [ResultOutputPath] result output path
+```
+
+For example:
+`./bin/Meta-Prism2.0 --tree [TreePath] -lp [PdataListPath] -ss [FilePath] 3 -c 5 -o [ResultPath]`
+Multiple samples can be read from the pdata file as the database, searched with the sample in FilePath, returned the three best matched samples, and output to ResultPath. It uses 5 CPU cores to work.
+## Supplement
+We provide Silva tree data, SSU_ TSV data, pdata data, filelist data
+[Silva进化树](https://www.arb-silva.de/fileadmin/silva_databases/living_tree/LTP_release_132/LTPs132_SSU_tree.newick)
+[SSU_tsv数据](https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/download/v1.0-with-data/MGYS00000337-ERR358543.tsv)
+[100样本pdata数据](https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/download/v1.0-with-data/100samples.pdata)
+[1000样本pdata数据](https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/download/v1.0-with-data/1000samples.pdata)
+## Author
+Kai Kang  sf257518@gmail.com
+Kang Ning  ningkang@hust.edu.cn
 
 # 中文
 ## 介绍
@@ -22,7 +67,7 @@ Meta-Prism 2.0 是一个速度更快的微生物组样本比对、搜索软件�
 我们在CentOS 7.6 的服务器上使用gcc 4.8.5成功编译了程序，而在macOS 10.15中也完成了编译。
 ## 下载与使用：
 ### 使用 git clone 操作去下载源代码:
-Pass
+`git clone https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0.git`
 ### 编译程序:
 `make`
 ### 删除程序:
