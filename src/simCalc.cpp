@@ -220,7 +220,6 @@ compareResult* matrixCompare( class loader & A){
     auto begin=clock();
     int m=0;auto iterI=A.Data.begin();
     for(i=0;i<x;i++){
-        
         result->data[i][i]=1;
         auto iterJ=iterI;
         for(j=i+1;j<x;j++){
@@ -242,7 +241,7 @@ compareResult* matrixCompare( class loader & A){
 }
 void *lineCompare(void * args){
     LineCompareArg * arg=(LineCompareArg*)args;
-    
+    bool lowMem=arg->result->lowMem;
     if(arg->B==NULL)
         arg->B=arg->A;
     int size=arg->B->size();
@@ -254,6 +253,7 @@ void *lineCompare(void * args){
     }
     for(int i=arg->id;i<size;i+=arg->core){
         if(arg->B==arg->A){//matrix
+            
             auto boost=new booster(arg->A->p);
             boost->setData(iter->second);
             boost->convert(*(arg->A),i+1);
@@ -298,7 +298,7 @@ void *lineCompare(void * args){
     }
     return NULL;
 }
-compareResult* matrixBoostCompare( class loader & A,int core){
+compareResult* matrixBoostCompare( class loader & A,int core,bool lowMem){
     compareResult* result;
     
     booster * boost;
@@ -308,7 +308,7 @@ compareResult* matrixBoostCompare( class loader & A,int core){
         core=1;}
     result=new compareResult;
     x=result->x=result->y=A.size();
-    result->dataAlloc(x,x,true);
+    result->dataAlloc(x,x,true,lowMem);
     A.genName();
     cout<<"calculating "<<x<<'*'<<x<<" similarity matrix\n";
     pBar=new progressBar;
@@ -336,14 +336,23 @@ compareResult* matrixBoostCompare( class loader & A,int core){
             boost->setData(iterI->second);
             boost->convert(A,i+1);
             auto bResult=boost->calc();
-            for(j=i+1;j<x;j++){
-                m+=1;
-                if(m%20==0)
-                    pBar->show(m);
-                //cout<<i<<' '<<j<<endl;
-                auto Var=bResult[j-i-1];
-                result->data[i][j-i]=bResult[j-i-1];
-                
+            if(lowMem){
+                for(j=i+1;j<x;j++){
+                    m+=1;
+                    if(m%20==0)
+                        pBar->show(m);
+                    //cout<<i<<' '<<j<<endl;
+                    result->data16[i][j-i]=bResult[j-i-1];
+                }
+            }
+            else{
+                for(j=i+1;j<x;j++){
+                    m+=1;
+                    if(m%20==0)
+                        pBar->show(m);
+                    //cout<<i<<' '<<j<<endl;
+                    result->data[i][j-i]=bResult[j-i-1];
+                }
             }
             delete bResult;
             delete boost;
