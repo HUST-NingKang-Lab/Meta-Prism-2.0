@@ -126,27 +126,100 @@ private:
     int *nums,*data,depth,*index,ptr,sum,iter,nIter;
     vector<waitElement> inputs;
 };
+
+class uFP16{
+    //Storage Result
+    //Value is between 0~1
+    //first 6 bit exponent
+    //last 10 bit fraction
+    const static uint32_t exp=5,shiftExp=23,frac=16-exp,shiftFrac=shiftExp-frac;
+    static uint32_t getFrac;//0x7FF;
+    static uint32_t Zero;
+    const static uint32_t getExp=0x0000FF;
+    const static uint32_t Min=0;
+    const static uint32_t Head=(0x1)<<29;
+    union Bits
+    {
+        float f;
+        int32_t si;
+        uint32_t ui;
+    };
+private:
+    uint16_t data;
+public:
+    uFP16(){
+        data=Zero;
+    }
+    void inline operator =(const float & value);
+    inline operator float();
+    bool check();
+};
+
+void uFP16::operator=(const float &value)
+{
+    uFP16::Bits f,e;
+    e.f=value;
+    e.ui=e.ui>>shiftExp;
+    e.ui&=getExp;
+    e.ui=127-e.ui;
+    if(e.ui>>exp){
+        data=Zero;
+        return;
+    }
+    e.ui<<=frac;
+    f.f=value;
+    f.ui>>=shiftFrac;
+    f.ui &= getFrac;
+    data=e.ui^f.ui;
+    return;
+}
+uFP16::operator float(){
+    uFP16::Bits e,f;
+    f.ui=data&getFrac;
+    f.ui=f.ui<<shiftFrac;
+    e.ui=(data>>frac);
+    e.ui=(127-e.ui);
+    e.ui=e.ui<<shiftExp;
+    e.ui=f.ui^e.ui;
+    return e.f;
+}
+
 class compareResult{
 public:
+    
     int x,y;
     bool symmetry=false;
-    bool big=false;
+    bool big=false,lowMem=false;
     vector<string> nameA,nameB;
     float **data;
+    uFP16 **data16;
     int load(ifstream &ifile);
     int save(ofstream &ofile);
     ~compareResult(){
-        if(big){
-            for(int i=0;i<x;i++)
-                delete[] data[i];
+        if (lowMem){
+            if(big){
+                for(int i=0;i<x;i++)
+                    delete[] data16[i];
+            }
+            else
+                delete []data16[0];
+            delete [] data16;
         }
-        else
-        delete []data[0];
-        delete [] data;
+        else{
+            if(big){
+                for(int i=0;i<x;i++)
+                    delete[] data[i];
+            }
+            else
+                delete []data[0];
+            delete [] data;
+            
+        }
         return;
     }
-    int dataAlloc(int x,int y,bool sym=false);
+    int dataAlloc(int x,int y,bool sym=false,bool lowFlag=false);
 };
+
 class progressBar{
 public:
     float value,all,percent;
@@ -172,8 +245,10 @@ public:
         }
     }
 };
+
 class searchResult{
 public:
+    
     int x,topN;
     index_value **data;
     int dataAlloc(int x,int topN){
@@ -184,10 +259,11 @@ public:
         for(int i=1;i<x;i++)
             data[i]=data[i-1]+topN;
         return 0;
-        }
+    }
     ~searchResult(){
         delete [] data[0];
         delete [] data;
     }
 };
+
 #endif /* structure_h */

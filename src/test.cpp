@@ -19,15 +19,16 @@ void printHelp(){
     <<"--package_search(-ps) + [package path]: search multi samples and return top N (default=5) similar samples\n"
     <<"--output(-o) [path]: path to output calculation result\n"
     <<"--save(-s) [path]: save package of loaded file\n"
+    <<"--low: low memory mode for matrix result storage, default is off\n"
     // <<"--convertOTU [path]: save as OTU format\n"
     // <<"--outTree [path]: save package of loaded file\n"
-    <<"--cores(-c)+ [cpu core number]:default single core\t--help(-h) help\n";
+    <<"--cores(-c)+ [number of thread]:default single thread\t--help(-h) help\n";
 }
 int main(int argc, const char * argv[]) {
     // insert code here...
     int i,cores=-1;
     ifstream ifile1,ifile2;ofstream ofile1,ofile2;
-    bool helpFlag=false,testFlag=false;
+    bool helpFlag=false,testFlag=false,lowMemory=false;
     compareResult* result;searchResult*result2;
     string buffer,pathTree,pathLoad,pathSample,pathOut,pathSave,pathConvert,pathOutTree,pathOutOrder;
     int loadStatus=-1,sampleStatus=-1,actionStatus=-1,topN=5,
@@ -139,6 +140,12 @@ int main(int argc, const char * argv[]) {
             helpFlag=true;
         else if(buffer=="--test")
             testFlag=true;
+        else if(buffer=="--low"){
+            uFP16 d;
+            lowMemory=d.check();
+            if(!lowMemory)
+                cout<<"Compiler or device don't follow IEEE854, can't use low memory mode"<<endl;
+        }
         buffer.clear();
     }
     if(i==1 || helpFlag){
@@ -201,7 +208,7 @@ int main(int argc, const char * argv[]) {
     }else{
         if(actionStatus==1){
             //result=matrixCompare(*database);
-            result=matrixBoostCompare(*database,cores);
+            result=matrixBoostCompare(*database,cores,lowMemory);
         }else{
             sample=new loader(p);
             ifile2.open(pathSample);
