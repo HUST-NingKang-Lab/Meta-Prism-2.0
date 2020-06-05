@@ -8,129 +8,24 @@
 
 #include "structure.h"
 int compareResult::save(ofstream &ofile){
-    ofile<<this->x<<' '<<this->y<<' '<<symmetry<<endl;
+    ofile<<this->x<<endl;
     for (auto iter=nameA.begin();iter!=nameA.end();iter++){
         
         ofile<<*iter<<' ';
     }
     ofile<<endl;
-    if(!symmetry){
-        for (auto iter=nameB.begin();iter!=nameB.end();iter++){
-            ofile<<*iter<<' ';
-        }
-        ofile<<endl;
-    }
-    int i,j;
-    if(lowMem){
-        for(i=0;i<x;i++){
-            if(symmetry){
-                for(j=0;j<i;j++){
-                    ofile<<(float)(data16[j][i])<<' ';}
-                ofile<<1<<' ';
-                for(j=i+1;j<y;j++){
-                    ofile<<(float)(data16[i][j])<<' ';
-                }
-            }
-            else{
-                for(j=0;j<y;j++)
-                    ofile<<(float)(data16[i][j])<<' ';
-            }ofile<<endl;
-        }
-    }
-    else{
-        for(i=0;i<x;i++){
-            if(symmetry){
-                for(j=0;j<i;j++)
-                    ofile<<data[j][i]<<' ';
-                ofile<<1<<' ';
-                for(j=i+1;j<y;j++)
-                    ofile<<data[i][j]<<' ';
-            }
-            else{
-                for(j=0;j<y;j++)
-                    ofile<<data[i][j]<<' ';
-            }ofile<<endl;
-        }
-    }
-    return 0;
+    if(lowMem)
+        return this->output(ofile, data16);
+    else
+        return this->output(ofile, data);
 }
-int compareResult::load(ifstream &ifile){
-    ifile>>x>>y>>symmetry;
-    string buf;
-    for(int i=0;i<x;i++){
-        ifile>>buf;
-        nameA.push_back(buf);
-    }
-    if(!symmetry){for(int i=0;i<y;i++){
-        ifile>>buf;
-        nameB.push_back(buf);
-    }}
-    int i,j;
-    dataAlloc(x,y,symmetry);
-    for(i=0;i<x;i++){
-        float buf;
-        if(symmetry){
-            for(j=0;j<y;j++){
-                if(j<i)
-                    ifile>>buf;
-                else
-                    ifile>>data[i][j];
-            }
-        }
-        else{
-            for(j=0;j<y;j++){
-                ifile>>data[i][j];
-                if(symmetry)
-                    data[j][i]=data[i][j];
-            }}}
-    if(symmetry){
-        for(i=0;i<x;i++)
-            data[i][i]=1;
-    }
-    return 0;
-}
-int compareResult::dataAlloc(int x,int y,bool sym,bool lowFlag){
+int compareResult::dataAlloc(int x,bool lowFlag){
     lowMem=lowFlag;
-    symmetry=sym;
-    if (lowFlag){
-        data16=new uFP16*[x];
-        
-        if(!sym){
-            if(x<10000||y<10000){
-                data16[0]=new uFP16[x*y];
-                for(int i=1;i<x;i++)
-                    data16[i]=data16[0]+i*y;}
-            else{
-                big=true;
-                for (int i=0;i<x;i++){
-                    data16[i]=new uFP16[y];
-                }}}
-        else{
-            big=true;
-            for(int i=0;i<x;i++)
-                data16[i]=new uFP16[y-i];
-        }
-    }
-    else{
-        data=new float*[x];
-        if(!sym){
-            if(x<10000||y<10000){
-                data[0]=new float[x*y];
-                for(int i=1;i<x;i++)
-                    data[i]=data[0]+i*y;}
-            else{
-                big=true;
-                for (int i=0;i<x;i++){
-                    data[i]=new float[y];
-                }}}
-        else{
-            big=true;
-            for(int i=0;i<x;i++)
-                data[i]=new float[y-i];
-        }}
-    return 0;
+    if (lowFlag)
+        return this->alloc(x, &(this->data16));
+    else
+        return this->alloc(x, &(this->data));
 }
-
 bool uFP16::check()
 {
     Bits A[5];
@@ -150,3 +45,41 @@ bool uFP16::check()
 }
 uint32_t uFP16::getFrac=(uint32_t)lroundf(powf(2, uFP16::frac))-1;// round(pow(2, uFP16::frac))-1;
 uint32_t uFP16::Zero=((uint32_t)(lroundf(powf(2, uFP16::exp))-1))<<uFP16::frac;
+ostream  &operator<<(ostream &out, uFP16 &c1){
+    out<<(float)c1;
+    return out;
+}
+template<typename T>
+int compareResult::alloc(int x, T ***sData){
+    auto genData=new T*[x];
+    for (int i=0;i<x;i++){
+        genData[i]=new T[x-i];
+    }
+    *sData=genData;
+    return 0;
+}
+template<typename T>
+int compareResult::output(ofstream &ofile,T** sData){
+    int i,j;
+    for(i=0;i<x;i++){
+        for(j=0;j<i;j++){
+            ofile<<(sData[j][i-j-1])<<' ';}
+        ofile<<1<<' ';
+        for(j=i+1;j<y;j++){
+            ofile<<(sData[i][j-i-1])<<' ';
+        }
+        ofile<<endl;
+    }
+    return 0;
+}
+int compareResult::sendResult(int i,float* result){
+    if(lowMem){
+        for(int t=0;t<(x-i-1);t++)
+            data16[i][t]=result[t];
+    }
+    else{
+        for(int t=0;t<(x-i-1);t++)
+            data[i][t]=result[t];
+    }
+    return 0;
+}

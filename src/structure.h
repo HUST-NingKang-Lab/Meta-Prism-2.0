@@ -132,7 +132,7 @@ class uFP16{
     //Value is between 0~1
     //first 6 bit exponent
     //last 10 bit fraction
-    const static uint32_t exp=5,shiftExp=23,frac=16-exp,shiftFrac=shiftExp-frac;
+    const static uint32_t exp=4,shiftExp=23,frac=16-exp,shiftFrac=shiftExp-frac;
     static uint32_t getFrac;//0x7FF;
     static uint32_t Zero;
     const static uint32_t getExp=0x0000FF;
@@ -183,8 +183,13 @@ uFP16::operator float(){
     e.ui=f.ui^e.ui;
     return e.f;
 }
-
+ostream  &operator<<(ostream &out, uFP16 &c1);
 class compareResult{
+private:
+    template <typename T>
+    int alloc(int x,T*** sData);
+    template <typename T>
+    int output(ofstream &ofile,T** sData);
 public:
     
     int x,y;
@@ -197,27 +202,22 @@ public:
     int save(ofstream &ofile);
     ~compareResult(){
         if (lowMem){
-            if(big){
-                for(int i=0;i<x;i++)
-                    delete[] data16[i];
-            }
-            else
-                delete []data16[0];
+            for(int i=0;i<x;i++)
+                delete[] data16[i];
+            
             delete [] data16;
         }
         else{
-            if(big){
-                for(int i=0;i<x;i++)
-                    delete[] data[i];
-            }
-            else
-                delete []data[0];
+            for(int i=0;i<x;i++)
+                delete[] data[i];
+            
             delete [] data;
             
         }
         return;
     }
-    int dataAlloc(int x,int y,bool sym=false,bool lowFlag=false);
+    int dataAlloc(int x,bool lowFlag=false);
+    int sendResult(int i,float* result);
 };
 
 class progressBar{

@@ -202,6 +202,8 @@ float* multiSparseCompare(float ** a,float**b,const CompData* compData,int sampl
     {
         
         result[j]+=min(a[order_N][j],b[order_N][j]);
+        result[j]=min(result[j],(float)1);
+        result[j]=max(result[j],(float)0);
     }
     delete[] min_2;delete []min_1;
     return result;
@@ -259,10 +261,7 @@ void *lineCompare(void * args){
             boost->convert(*(arg->A),i+1);
             //boost->genCompareData();
             auto bResult=boost->calc();
-            arg->result->data[i][0]=1;
-            for(int j=i+1;j<size;j++){
-                arg->result->data[i][j-i]=bResult[j-i-1];
-            }
+            arg->result->sendResult(i, bResult);
             delete bResult;
             delete boost;
         }
@@ -308,7 +307,7 @@ compareResult* matrixBoostCompare( class loader & A,int core,bool lowMem){
         core=1;}
     result=new compareResult;
     x=result->x=result->y=A.size();
-    result->dataAlloc(x,x,true,lowMem);
+    result->dataAlloc(x,lowMem);
     A.genName();
     cout<<"calculating "<<x<<'*'<<x<<" similarity matrix\n";
     pBar=new progressBar;
@@ -329,6 +328,7 @@ compareResult* matrixBoostCompare( class loader & A,int core,bool lowMem){
     }
     else{
         int m=0;auto iterI=A.Data.begin();
+
         for(i=0;i<x;i++,iterI++){
             boost=new booster(A.p);
             if(iterI->second->data.size()==0)
@@ -336,24 +336,7 @@ compareResult* matrixBoostCompare( class loader & A,int core,bool lowMem){
             boost->setData(iterI->second);
             boost->convert(A,i+1);
             auto bResult=boost->calc();
-            if(lowMem){
-                for(j=i+1;j<x;j++){
-                    m+=1;
-                    if(m%20==0)
-                        pBar->show(m);
-                    //cout<<i<<' '<<j<<endl;
-                    result->data16[i][j-i]=bResult[j-i-1];
-                }
-            }
-            else{
-                for(j=i+1;j<x;j++){
-                    m+=1;
-                    if(m%20==0)
-                        pBar->show(m);
-                    //cout<<i<<' '<<j<<endl;
-                    result->data[i][j-i]=bResult[j-i-1];
-                }
-            }
+            result->sendResult(i, bResult);
             delete bResult;
             delete boost;
             
