@@ -56,6 +56,8 @@ int compareResult::alloc(int x, T ***sData){
         genData[i]=new T[x-i];
     }
     *sData=genData;
+    pBar.init(x*x/2);
+    pthread_mutex_init(&showLock,NULL);
     return 0;
 }
 template<typename T>
@@ -81,5 +83,8 @@ int compareResult::sendResult(int i,float* result){
         for(int t=0;t<(x-i-1);t++)
             data[i][t]=result[t];
     }
+    pthread_mutex_lock(&showLock);
+    pBar.show(x-i);
+    pthread_mutex_unlock(&showLock);
     return 0;
 }
