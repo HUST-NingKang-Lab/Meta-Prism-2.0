@@ -19,7 +19,7 @@ void printHelp(){
     <<"--package_search(-ps) + [package path]: search multi samples and return top N (default=5) similar samples\n"
     <<"--output(-o) [path]: path to output calculation result\n"
     <<"--save(-s) [path]: save package of loaded file\n"
-    <<"--low: low memory mode for matrix result storage, default is off\n"
+    <<"--low: low memory mode for matrix result storage, default is on\n"
     // <<"--convertOTU [path]: save as OTU format\n"
     // <<"--outTree [path]: save package of loaded file\n"
     <<"--cores(-c)+ [number of thread]:default single thread\t--help(-h) help\n";
@@ -28,7 +28,7 @@ int main(int argc, const char * argv[]) {
     // insert code here...
     int i,cores=-1;
     ifstream ifile1,ifile2;ofstream ofile1,ofile2;
-    bool helpFlag=false,testFlag=false,lowMemory=false;
+    bool helpFlag=false,testFlag=false,lowMemory=true;
     compareResult* result;searchResult*result2;
     string buffer,pathTree,pathLoad,pathSample,pathOut,pathSave,pathConvert,pathOutTree,pathOutOrder;
     int loadStatus=-1,sampleStatus=-1,actionStatus=-1,topN=5,
