@@ -57,7 +57,7 @@ We provide Silva tree data, SSU_TSV file, pdata file
 [100 sample pdata](https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/download/v1.0-with-data/100samples.pdata)  
 [1000 sample pdata](https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/download/v1.0-with-data/1000samples.pdata)  
 ## Author
-Kai Kang  sf257518@gmail.com  
+Kai Kang  sf257518@icloud.com  
 Kang Ning  ningkang@hust.edu.cn  
 
 # 中文
@@ -115,5 +115,5 @@ Meta-Prism 2.0 可以实现单个/多个微生物样本对另一组微生物样�
 [100样本pdata数据](https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/download/v1.0-with-data/100samples.pdata)  
 [1000样本pdata数据](https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/download/v1.0-with-data/1000samples.pdata)  
 ## 作者
-康凯 sf257518@gmail.com  
+康凯 sf257518@icloud.com  
 宁康 ningkang@hust.edu.cn

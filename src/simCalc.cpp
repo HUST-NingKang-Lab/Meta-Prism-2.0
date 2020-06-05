@@ -18,7 +18,6 @@ struct twoValue{
 bool i_v_cmp(const index_value& a,const index_value& b){
     return a.value>b.value;
 }
-progressBar *pBar;
 void calcOne(unordered_map<int,state> stateDic,multimap<int,int> toDo);
 float sparseSimCalcPair(const sampleData &a,const sampleData &b,const Table* table){
     float sim=0,m,dis;int fid;
@@ -217,9 +216,8 @@ compareResult* matrixCompare( class loader & A){
     result->dataAlloc(x,x);result->symmetry=true;
     A.genName();
     cout<<"calculating "<<x<<'*'<<x<<" similarity matrix\n";
-    pBar=new progressBar;
+    auto pBar=new progressBar;
     pBar->init(x*x/2);
-    auto begin=clock();
     int m=0;auto iterI=A.Data.begin();
     for(i=0;i<x;i++){
         result->data[i][i]=1;
@@ -237,7 +235,6 @@ compareResult* matrixCompare( class loader & A){
         iterI++;
     }
     delete pBar;
-    cout << "using "<< (clock() - begin) * 1.0 / CLOCKS_PER_SEC<<endl;
     result->nameA=A.names;
     return result;
 }
@@ -310,8 +307,7 @@ compareResult* matrixBoostCompare( class loader & A,int core,bool lowMem){
     result->dataAlloc(x,lowMem);
     A.genName();
     cout<<"calculating "<<x<<'*'<<x<<" similarity matrix\n";
-    pBar=new progressBar;
-    pBar->init(x*x/2);auto begin=clock();
+    
     if(core >1){
         pthread_t * tids;
         LineCompareArg * args;
@@ -328,7 +324,6 @@ compareResult* matrixBoostCompare( class loader & A,int core,bool lowMem){
     }
     else{
         int m=0;auto iterI=A.Data.begin();
-
         for(i=0;i<x;i++,iterI++){
             boost=new booster(A.p);
             if(iterI->second->data.size()==0)
@@ -341,8 +336,8 @@ compareResult* matrixBoostCompare( class loader & A,int core,bool lowMem){
             delete boost;
             
         }}
-    cout << "using "<< (clock() - begin) * 1.0 / CLOCKS_PER_SEC<<endl;
     result->nameA=A.names;
+    cout<<endl;
     return result;
 }
 compareResult* searchCompare( class loader &A,  class loader &B, int core){
@@ -357,7 +352,6 @@ compareResult* searchCompare( class loader &A,  class loader &B, int core){
     A.genName();B.genName();
     pb.init(x*y/2);
     int m=0;
-    auto begin=clock();
     auto iterI=A.Data.begin();
     for(i=0;i<x;i++){
         auto iterJ=B.Data.begin();
@@ -373,7 +367,6 @@ compareResult* searchCompare( class loader &A,  class loader &B, int core){
     result->nameA=A.names;
     result->nameB=B.names;
     
-    cout << "using "<<(clock() - begin) * 1.0 / CLOCKS_PER_SEC<<endl;
     return result;
 }
 
@@ -389,8 +382,8 @@ searchResult* searchBoostCompare(class loader &A,class loader &B,int core,int to
     result->dataAlloc(B.size(),topN);
     A.genName();
     cout<<"calculating "<<x<<'*'<<x<<" similarity matrix\n";
-    pBar=new progressBar;
-    pBar->init(x*x/2);auto begin=clock();
+    auto pBar=new progressBar;
+    pBar->init(x*x);
     if(core >1){
         pthread_t * tids;
         LineCompareArg * args;
@@ -417,13 +410,11 @@ searchResult* searchBoostCompare(class loader &A,class loader &B,int core,int to
             vector<struct index_value> datas;
             datas.resize(x);
             for(j=0;j<x;j++){
-                m+=1;
-                if(m%20==0)
-                    pBar->show(m);
                 //cout<<i<<' '<<j<<endl;
                 datas[j].index=j;
                 datas[j].value=bResult[j];
             }
+            pBar->show(x);
             partial_sort(datas.begin(), datas.begin()+topN, datas.end(),i_v_cmp);
             for(j=0;j<topN;j++)
                 result->data[i][j]=datas[j];
@@ -431,7 +422,6 @@ searchResult* searchBoostCompare(class loader &A,class loader &B,int core,int to
             delete boost;
             
         }}
-    cout << "using "<< (clock() - begin) * 1.0 / CLOCKS_PER_SEC<<endl;
     //result->nameA=A.names;
     return result;
 }

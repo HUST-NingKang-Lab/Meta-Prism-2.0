@@ -15,6 +15,7 @@
 #include <stack>
 #include <cmath>
 #include <algorithm>
+#include <pthread.h>
 #include <map>
 #include <fstream>
 #include <string.h>
@@ -184,14 +185,41 @@ uFP16::operator float(){
     return e.f;
 }
 ostream  &operator<<(ostream &out, uFP16 &c1);
+class progressBar{
+public:
+    uint64_t value,all;
+    float percent;
+    int print=0;
+    void init(uint64_t a){
+        value=0;all=a;
+        percent=100*value/all;
+        cout<<endl;
+    }
+    void show(unsigned int a){
+        value+=a;
+        percent=100*(float)value/(float)all;
+        while(percent>print){
+            print++;
+            if(print%50==0)
+                cout<<'|';
+            else if(print%10==0)
+                cout<<'&';
+            else
+                cout<<'*';
+            cout<<flush;
+        }
+    }
+};
+
 class compareResult{
 private:
     template <typename T>
     int alloc(int x,T*** sData);
     template <typename T>
     int output(ofstream &ofile,T** sData);
+    pthread_mutex_t showLock;
 public:
-    
+    progressBar pBar;
     int x,y;
     bool symmetry=false;
     bool big=false,lowMem=false;
@@ -220,31 +248,6 @@ public:
     int sendResult(int i,float* result);
 };
 
-class progressBar{
-public:
-    float value,all,percent;
-    int print=0;
-    void init(int a){
-        value=0;all=a;
-        percent=100*value/all;
-        cout<<endl;
-        cout<<"percents:"<<flush;
-    }
-    void show(int a){
-        value=a;
-        percent=100*value/all;
-        while(percent>print){
-            print++;
-            if(print%50==0)
-                cout<<'|';
-            else if(print%10==0)
-                cout<<'&';
-            else
-                cout<<'*';
-            cout<<flush;
-        }
-    }
-};
 
 class searchResult{
 public:
