@@ -240,7 +240,6 @@ compareResult* matrixCompare( class loader & A){
 }
 void *lineCompare(void * args){
     LineCompareArg * arg=(LineCompareArg*)args;
-    bool lowMem=arg->result->lowMem;
     if(arg->B==NULL)
         arg->B=arg->A;
     int size=arg->B->size();
@@ -263,8 +262,8 @@ void *lineCompare(void * args){
             delete boost;
         }
         else{
-            int m=0,j,topN=arg->number;
-            int x=arg->A->size();int y=arg->B->size();
+            int j,topN=arg->number;
+            int x=arg->A->size();
             auto boost=new booster(arg->A->p);
             searchResult* result=(searchResult*)arg->result;
             if(iter->second->data.size()==0){
@@ -323,7 +322,7 @@ compareResult* matrixBoostCompare( class loader & A,int core,bool lowMem){
         delete []tids;delete []args;
     }
     else{
-        int m=0;auto iterI=A.Data.begin();
+        auto iterI=A.Data.begin();
         for(i=0;i<x;i++,iterI++){
             boost=new booster(A.p);
             if(iterI->second->data.size()==0)
@@ -401,9 +400,10 @@ searchResult* searchBoostCompare(class loader &A,class loader &B,int core,int to
     else{
         int m=0;auto iterI=B.Data.begin();
         for(i=0;i<y;i++,iterI++){
-            boost=new booster(A.p);
+            
             if(iterI->second->data.size()==0)
                 continue;
+            boost=new booster(A.p);
             boost->setData(iterI->second);
             boost->convert(A);
             auto bResult=boost->calc();
@@ -422,6 +422,7 @@ searchResult* searchBoostCompare(class loader &A,class loader &B,int core,int to
             delete boost;
             
         }}
+    delete pBar;
     //result->nameA=A.names;
     return result;
 }

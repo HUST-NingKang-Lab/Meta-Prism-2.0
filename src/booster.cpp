@@ -117,11 +117,11 @@ int booster::convert(loader &A,int begin,int end){
     for(;j<end;j++,iter++,i++){
         auto &data=iter->second->data;
         for(auto dataIter=data.begin();dataIter!=data.end();dataIter++){
-            targetID=table[dataIter->ID].targetID;
-            val=table[dataIter->ID].coef*dataIter->data;
+            auto& x=table[dataIter->ID];
+            targetID=x.targetID;
+            val=x.coef*dataIter->data;
             matrix[targetID][i]+=val;
         }
-        
     }
     auto &sourceData=this->data->data;
     for(auto dataIter=sourceData.begin();dataIter!=sourceData.end();dataIter++){

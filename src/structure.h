@@ -192,6 +192,8 @@ public:
     int print=0;
     void init(uint64_t a){
         value=0;all=a;
+        if(a==0)
+            all=1;
         percent=100*value/all;
         cout<<endl;
     }

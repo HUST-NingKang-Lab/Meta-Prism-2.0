@@ -29,9 +29,9 @@ int main(int argc, const char * argv[]) {
     int i,cores=-1;
     ifstream ifile1,ifile2;ofstream ofile1,ofile2;
     bool helpFlag=false,testFlag=false,lowMemory=true;
-    compareResult* result;searchResult*result2;
+    compareResult* result=nullptr;searchResult*result2=nullptr;
     string buffer,pathTree,pathLoad,pathSample,pathOut,pathSave,pathConvert,pathOutTree,pathOutOrder;
-    int loadStatus=-1,sampleStatus=-1,actionStatus=-1,topN=5,
+    int loadStatus=-1,actionStatus=-1,topN=5,
     outStatus=-1,saveStatus=-1,convertStatus=-1,outTreeStatus=-1,
     outOrderStatus=-1;
     parser *p = nullptr;loader *database,*sample;
