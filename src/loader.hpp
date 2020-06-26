@@ -24,7 +24,7 @@ public:
     vector<string> names;
     parser *p;
     loader(parser *p){this->p=p;}
-    int loadMultiData(ifstream &ifile);
+    int loadOTUData(ifstream &ifile);
     const vector<sampleData>& getData(){return data;}
     int loadCompData(ifstream &ifile);
     sampleData* loadTSVFile(ifstream &ifile,string name="not defined");

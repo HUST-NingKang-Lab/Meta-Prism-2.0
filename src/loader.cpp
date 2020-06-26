@@ -8,18 +8,30 @@
 
 #include "loader.hpp"
 string Bacteria="Bacteria";
-int getID(const string &A,const unordered_map<string, int> &lable){
-    int id=-1,begin=0,i;
+void changeRelative(vector<sampleData*> &A){
+    for(auto iter=A.begin();iter!=A.end();iter++){
+        sampleData &data=*(*iter);
+        double sum=0;
+        for(auto dIter=data.data.begin();dIter!=data.data.end();dIter++)
+            sum+=dIter->data;
+        for(auto dIter=data.data.begin();dIter!=data.data.end();dIter++)
+            dIter->data/=sum;
+    }
+}
+int getID(const string &A,const unordered_map<string, int> &lable,int begin=-1){
+    int id=-1,i;
     string buf_sp,buf_name;bool select=false,sp=true;
     vector<string> level;
+    if(begin==-1){begin=0;
     for(i=0;i<2;i++){
+        
         while(A[begin]!='\t'&&A[begin]!=' '){
             begin++;
             if(begin>=A.length())
                 break;
         }
         begin++;
-    }
+    }}
     if(A.substr(begin,4)=="Root"){
         while(A[begin]!=';'){
             begin++;
@@ -77,46 +89,50 @@ int getID(const string &A,const unordered_map<string, int> &lable){
         }
     }
     return id;
-}/*
-int loader::loadMultiData(ifstream &ifile){
+}
+int loader::loadOTUData(ifstream &ifile){
     string readBuf,buffer;stringstream buf;float value;
     getline(ifile,readBuf);
+    replace(readBuf.begin(), readBuf.end(), '\t', ' ');
+    replace(readBuf.begin(), readBuf.end(), ',', ' ');
     buf.str(readBuf);
-    buf>>buffer;//ID
+    buf>>buffer;// #OTUID
     auto label=this->p->getLabel();
+    vector<sampleData*> datas;
+    sampleData *x;
     while(buf.rdbuf()->in_avail()){
-        sampleData x;
-        buf>>x.name;
-        this->Data.push_back(x);
+        x=new sampleData;
+        buf>>x->name;
+        datas.push_back(x);
     }
-    int m=0;
-    cout<<"Hundred Files:";
     while(getline(ifile, readBuf)){
-        if(m%100==0){
-            cout<<'*';
-        }
+        replace(readBuf.begin(), readBuf.end(), '\t', ' ');
+        replace(readBuf.begin(), readBuf.end(), ',', ' ');
+        
         buf.clear();
         buf.str(readBuf);
         buf>>buffer;//name
         int i=0;
         abdElement abdBuf;
-        auto iter=label.find(buffer);
-        if(iter==label.end()){
+        abdBuf.ID=getID(buffer, label,0);
+        if(abdBuf.ID==-1)
             continue;
-        }
-        abdBuf.ID=iter->second;
         while(buf.rdbuf()->in_avail()){
             buf>>value;
             if(value>1E-10){
                 abdBuf.data=value;
-                data[i].data.push_back(abdBuf);
+                datas[i]->data.push_back(abdBuf);
             }
             i++;
         }
     }
+    changeRelative(datas);
+    for(auto iter=datas.begin();iter!=datas.end();iter++){
+        Data[(*iter)->name]=(*iter);
+    }
     cout<<endl;
     return 0;
-}*/
+}
 int loader::loadCompData(ifstream &ifile){
     int leafSize=p->getLeafSize();
     compData.order_1=new int[leafSize];

@@ -29,7 +29,8 @@ Note that the generated ". pdata" data file is bound to the evolution tree and c
 Meta prism 2.0 can load the data of microbiome samples and calculate the similarity matrix between samples. Relevant args are:
 ```
 --load_from_list(-ll) [FileListPath] load data from files in path list
---load_from_package(-lp) [PdataListPath] load data from packaged pdata file(mutually exclusive with the former)
+--load_from_package(-lp) [PdataPath] load data from packaged pdata file(mutually exclusive with the former)
+--load_from_OTU(-lo) [OTUPath] load data from packaged pdata file(mutually exclusive with the former)
 --cores(-c) [CoreNumber=1] core usage, default is 1
 --output(-o) [ResultOutputPath] result output path
 ```
@@ -41,8 +42,9 @@ You can read all the sample file paths contained in the list file corresponding 
 Meta prism 2.0 can search one or more microbial samples for another group of microbial samples, and return the top n sample name with the highest similarity and similarity. Relevant args are:
 ```
 --single_search(-ss) [FilePath] [TopN] load data from a single sample file and returns TopN most similar results. TopN is optional, default is 5
---multi_search(-ms) [FileListPath] [TopN] load data from sample file lists
---package_search(-ps) [PdataListPath] [TopN] load data from packaged file（Mutually exclusive with the first two）
+--multi_search(-ms) [FileListPath] [TopN] load data from sample file lists (mutually exclusive with the former)
+--package_search(-ps) [PdataPath] [TopN] load data from packaged file (mutually exclusive with the former)
+--OTU_search(-os) [OTUPath] [TopN] load data from OTU file (mutually exclusive with the former)
 --cores(-c) [CoreNumber=1] core usage, default is 1
 --output(-o) [ResultOutputPath] result output path
 ```
@@ -100,8 +102,8 @@ Meta-Prism 2.0 可以装载微生物组样本数据并计算出样本间相似�
 Meta-Prism 2.0 可以实现单个/多个微生物样本对另一组微生物样本的搜索，并返回相似度最高的top N样本名称以及相似度。相关参数为：
 ```
 --single_search(-ss) [FilePath] [TopN] 从单个样本文件中读取数据，并返回TopN个最相似的结果，TopN可以不加，默认为5
---multi_search(-ms) [FileListPath] [TopN] 从样本文件列表中读取数据
---package_search(-ps) [PdataListPath] [TopN]从pdata文件中读取数据（三者互斥）
+--multi_search(-ms) [FileListPath] [TopN] 从样本文件列表中读取数据 （与前者互斥）
+--package_search(-ps) [PdataListPath] [TopN]从pdata文件中读取数据 （与前者互斥）
 --cores(-c) [CoreNumber=1] 使用CPU核数，默认为1
 --output(-o) [ResultOutputPath] 结果输出路径
 ```
