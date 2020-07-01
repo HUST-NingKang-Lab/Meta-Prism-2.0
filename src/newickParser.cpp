@@ -23,7 +23,7 @@ parser::parser(string newickTree, int mod) {
 }
 void parser::parseOne(char *newick, int &index, int end, TreeNode &node,int mod) {
     if (newick[index]!='(')
-        cout<<"Error\n";
+        cout<<"Error can't parse newick tree\n maybe you didn't delete annotation of tree?\n";
     //left child name
     node.lChild=new TreeNode;
     node.lChild->father=&node;

@@ -119,11 +119,14 @@ int loader::loadOTUData(ifstream &ifile){
             continue;
         while(buf.rdbuf()->in_avail()){
             buf>>value;
+            cout<<buf.rdbuf()->in_avail()<<' ';
             if(value>1E-10){
                 abdBuf.data=value;
                 datas[i]->data.push_back(abdBuf);
             }
             i++;
+            if(i>=datas.size())
+                break;
         }
     }
     changeRelative(datas);
@@ -199,8 +202,13 @@ sampleData* loader::loadTSVFile(ifstream &ifile,string name){
 int loader::loadMultiTSV(ifstream &ifile){
     string nameBuffer,buf;ifstream TSVFile;
     int i,j=0;
+    uint64_t s=0;
     sampleData* sDBuf;
+    cout<<"processed hundreds of files:";
     while(getline(ifile, nameBuffer)){
+        s+=1;
+        if(s%100==0)
+            cout<<'*';
         TSVFile.open(nameBuffer);
         for(i=0;i<nameBuffer.length();i++){
             if(nameBuffer[i]=='/')
@@ -211,6 +219,7 @@ int loader::loadMultiTSV(ifstream &ifile){
         Data[buf]=sDBuf;
         TSVFile.close();
     }
+    cout<<endl;
     return 0;
 }
 int loader::outputMirror(ofstream &ofile){
@@ -242,7 +251,7 @@ int loader::loadFromMirror(ifstream &ifile){
             case 0:
             {
                 if(buffer!="{")
-                    cout<<"0Error\n";
+                    cout<<"Error in loading pdata, type 0\n";
                 else
                     state=1;
                 break;
@@ -271,7 +280,7 @@ int loader::loadFromMirror(ifstream &ifile){
                 break;
             }case 3:{
                 if(buffer!="}")
-                    cout<<"3Error";
+                    cout<<"Error in loading pdata, type 3\n";
                 else{
                     state=0;
                     Data[nameBuffer]=data;

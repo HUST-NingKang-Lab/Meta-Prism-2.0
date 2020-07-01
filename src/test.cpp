@@ -45,7 +45,7 @@ int main(int argc, const char * argv[]) {
             pathTree=argv[++i];
         }else if(buffer=="-ll"||buffer=="--load_from_list"){
             if(loadStatus!=-1){
-                cout<<"Error, multi loads\n";
+                cout<<"Error, multi load commands\n";
                 return 0;
             }else{
                 loadStatus=1;
@@ -53,7 +53,7 @@ int main(int argc, const char * argv[]) {
             }
         }else if(buffer=="-lp"||buffer=="--load_from_package"){
             if(loadStatus!=-1){
-                cout<<"Error, multi loads\n";
+                cout<<"Error, multi load commands\n";
                 return 0;
             }else{
                 loadStatus=2;
@@ -61,7 +61,7 @@ int main(int argc, const char * argv[]) {
             }
         }else if(buffer=="-lo"||buffer=="--load_from_OTU"){
             if(loadStatus!=-1){
-                cout<<"Error, multi loads\n";
+                cout<<"Error, multi load commands\n";
                 return 0;
             }else{
                 loadStatus=3;
@@ -70,14 +70,14 @@ int main(int argc, const char * argv[]) {
         }
         else if(buffer=="-m"||buffer=="--matrix"){
             if(actionStatus!=-1){
-                cout<<"Error, can search and calculate matrix in one command\n";
+                cout<<"Error, can't search and calculate matrix in one command\n";
                 return 0;
             }else{
                 actionStatus=1;
             }
         }else if(buffer=="-ss"||buffer=="--single_search"){
             if(actionStatus!=-1){
-                cout<<"Error, can search and calculate matrix in one command\n";
+                cout<<"Error, can't search or calculate matrix in one command\n";
                 return 0;
             }else{
                 actionStatus=2;
@@ -89,7 +89,7 @@ int main(int argc, const char * argv[]) {
             }
         }else if(buffer=="-ms"||buffer=="--multi_search"){
             if(actionStatus!=-1){
-                cout<<"Error, can search and calculate matrix in one command\n";
+                cout<<"Error, can't search or calculate matrix in one command\n";
                 return 0;
             }else{
                 actionStatus=3;
@@ -101,7 +101,7 @@ int main(int argc, const char * argv[]) {
             }
         }else if(buffer=="-ps"||buffer=="--package_search"){
             if(actionStatus!=-1){
-                cout<<"Error, can search and calculate matrix in one command\n";
+                cout<<"Error, can't search or calculate matrix in one command\n";
                 return 0;
             }else{
                 actionStatus=4;
@@ -113,7 +113,7 @@ int main(int argc, const char * argv[]) {
             }
         }else if(buffer=="-os"||buffer=="--OTU_search"){
             if(actionStatus!=-1){
-                cout<<"Error, can search and calculate matrix in one command\n";
+                cout<<"Error, can't search or calculate matrix in one command\n";
                 return 0;
             }else{
                 actionStatus=5;
@@ -189,6 +189,8 @@ int main(int argc, const char * argv[]) {
         }
         ifile1.close();
         as=buf.str();
+        auto b=as.find_first_of('(');
+        as=as.substr(b);
         p=new parser(as);
         
     }
@@ -267,13 +269,13 @@ int main(int argc, const char * argv[]) {
             ofile1.open(pathOut);
             if(actionStatus==1){
                 if(result==nullptr)
-                    cout<<"Error\n";
+                    cout<<"Error, no result to output\n";
                 else{
                     cout<<"Saving calculation result to: "<<pathOut<<endl;
                     result->save(ofile1);}}
             else{
                 if(result2==nullptr)
-                    cout<<"Error\n";
+                    cout<<"Error, no result to output\n";
                 else{
                     cout<<"Saving calculation result to: "<<pathOut<<endl;
                     sample->genName();

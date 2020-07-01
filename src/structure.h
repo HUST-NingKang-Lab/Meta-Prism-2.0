@@ -110,7 +110,7 @@ public:
         sum++;
         nIter=iter;
         if(index[nIter]<ptr){
-            cout<<"Type 1 ERROR\n";
+            cout<<"New map error\n";
             return false;
         }
         else
