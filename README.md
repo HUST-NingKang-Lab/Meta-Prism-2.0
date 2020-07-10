@@ -54,7 +54,7 @@ For example:
 Multiple samples can be read from the pdata file as the database, searched with the sample in FilePath, returned the three best matched samples, and output to ResultPath. It uses 5 CPU cores to work.
 ## Supplement
 We provide Silva tree data, SSU_TSV file, pdata file  
-[Silva tree](https://www.arb-silva.de/fileadmin/silva_databases/living_tree/LTP_release_132/LTPs132_SSU_tree.newick)   (need to delete header after download)
+[Silva tree](https://www.arb-silva.de/fileadmin/silva_databases/living_tree/LTP_release_132/LTPs132_SSU_tree.newick)   (need to delete header lines after download)
 
 [SSU_tsv data](https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/download/v1.0-with-data/MGYS00000337-ERR358543.tsv)  
 
@@ -118,7 +118,7 @@ Meta-Prism 2.0 可以实现单个/多个微生物样本对另一组微生物样�
 ## 补充
 我们提供了Silva进化树数据、SSU_tsv数据、pdata数据  
 
-[Silva进化树](https://www.arb-silva.de/fileadmin/silva_databases/living_tree/LTP_release_132/LTPs132_SSU_tree.newick)  
+[Silva进化树](https://www.arb-silva.de/fileadmin/silva_databases/living_tree/LTP_release_132/LTPs132_SSU_tree.newick)  (需要在下载后自行删掉文件头)
 
 [SSU_tsv数据](https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/download/v1.0-with-data/MGYS00000337-ERR358543.tsv)  
 

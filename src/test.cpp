@@ -189,8 +189,6 @@ int main(int argc, const char * argv[]) {
         }
         ifile1.close();
         as=buf.str();
-        auto b=as.find_first_of('(');
-        as=as.substr(b);
         p=new parser(as);
         
     }
