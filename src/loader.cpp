@@ -153,8 +153,9 @@ int loader::loadCompData(ifstream &ifile){
     return 0;
 }
 sampleData* loader::loadTSVFile(ifstream &ifile,string name){
+    //There are several types of TSV file: MGNify types and one FEAST type, this function aims at automatically detect tsv file's type and process it.
+    // When loading new tsv file with different type, you may edit this function to support it, or change tsv file's format to any MGNify/ FEAST type.
     string readBuf,buffer;stringstream buf;
-    //getline(ifile,readBuf);getline(ifile,readBuf);//pass begining two lines
     int id,type=0;
     float sumABD=0,v;
     sampleData* result=new sampleData;
@@ -162,7 +163,7 @@ sampleData* loader::loadTSVFile(ifstream &ifile,string name){
     const unordered_map<string, int> &label=p->getLabel();
     map<int, float> values;
     while(getline(ifile,readBuf)){
-        if(readBuf[0]=='#'){
+        if(readBuf[0]=='#'){// judge file type by the headlines' lenght
             type++;
             continue;}
         
@@ -173,11 +174,11 @@ sampleData* loader::loadTSVFile(ifstream &ifile,string name){
         }
         buf.clear();
         buf.str(readBuf);
-        buf>>v;//pass the OTU ID
-        if(type==2)
+        buf>>v;
+        if(type==2)// if type==2, current v is OTU ID
             buf>>v;//ABD
         //buf>>buffer;
-        if(v<1e-9)
+        if(v<1e-9)//Ignore too small abundance
             continue;
         id=getID(readBuf, label);
         buffer.clear();
