@@ -33,7 +33,7 @@ struct Table{
     int fid,bid,dep;float dist;//treeNode's father id is -1
 };
 struct abdElement{
-    int ID;float data;
+    uint32_t ID;float data;
 };
 struct sampleData{
     string name;

@@ -12,14 +12,59 @@
 #include "newickParser.h"
 #include <stdio.h>
 using namespace std;
+class BinaryIO{
+private:
+    bool littleE;
+public:
+    BinaryIO(){
+        union
+        {
+            unsigned int  a;
+            unsigned char b;
+        }c;
+        c.a = 1;
+        littleE=(1==c.b);
+    }
+    template <typename T>
+    void v2s(char *buf,T* V){
+        char *data=(char*)V;
+        uint32_t size=sizeof(T);
+        if(littleE){
+            memcpy(buf,data,size);
+        }
+        else{
+        for(int i=0;i<size;i++){
+            buf[i]=data[size-i];
+        }}
+    }
+    template <typename T>
+    void s2v(char *buf,T* V){
+        char *data=(char*)V;
+        uint32_t size=sizeof(T);
+        if(littleE){
+            memcpy(data,buf,size);
+        }
+        else{
+        for(int i=0;i<size;i++){
+            data[i]=buf[size-i];
+        }}
+    }
+};
 class loader{
 private:
     vector<sampleData> data;
-    
     CompData compData;
-    
-    
+    BinaryIO io;
 public:
+    struct Infos{
+        char source[20];
+        float version;
+        uint64_t size;
+    };
+    struct SampleHead{
+        char Name[38];
+        uint64_t sampleSize;
+    };
     map<string, sampleData*> Data;
     vector<string> names;
     parser *p;
@@ -30,6 +75,8 @@ public:
     sampleData* loadTSVFile(ifstream &ifile,string name="not defined");
     int loadMultiTSV(ifstream &ifile);
     int outputMirror(ofstream &ofile);
+    int loadBMultiTSV(ifstream &ifile);
+    int outputBMirror(ofstream &ofile);
     int loadFromMirror(ifstream &ifile);
     int outTSVTable(ofstream &ofile);
     int size(){return Data.size();}
@@ -42,4 +89,5 @@ public:
     int printToTable(ofstream &ofile);
     //int out
 };
+
 #endif /* loader_hpp */

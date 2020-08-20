@@ -59,6 +59,14 @@ int main(int argc, const char * argv[]) {
                 loadStatus=2;
                 pathLoad=argv[++i];
             }
+        }else if(buffer=="-lb"||buffer=="--load_from_binary"){
+            if(loadStatus!=-1){
+                cout<<"Error, multi load commands\n";
+                return 0;
+            }else{
+                loadStatus=4;
+                pathLoad=argv[++i];
+            }
         }else if(buffer=="-lo"||buffer=="--load_from_OTU"){
             if(loadStatus!=-1){
                 cout<<"Error, multi load commands\n";
@@ -140,6 +148,14 @@ int main(int argc, const char * argv[]) {
                 saveStatus=1;
                 pathSave=argv[++i];
             }
+        }else if(buffer=="-sb"||buffer=="--save_binary"){
+            if(saveStatus!=-1){
+                cout<<"Error, can only select path once\n";
+                return 0;
+            }else{
+                saveStatus=2;
+                pathSave=argv[++i];
+            }
         }else if(buffer=="-c"||buffer=="--cores"){
             if(cores!=-1){
                 cout<<"Error, can only select cores once\n";
@@ -198,18 +214,25 @@ int main(int argc, const char * argv[]) {
     }else{
         if(testFlag)
             startTime=clock();
-        ifile1.open(pathLoad);
+        
         database=new loader(p);
         cout<<"loading from "<<pathLoad<<endl;
         switch (loadStatus) {
             case 1:
+                ifile1.open(pathLoad);
                 database->loadMultiTSV(ifile1);
                 break;
             case 2:
+                ifile1.open(pathLoad);
                 database->loadFromMirror(ifile1);
                 break;
             case 3:
+                ifile1.open(pathLoad);
                 database->loadOTUData(ifile1);
+                break;
+            case 4:
+                ifile1.open(pathLoad,ios::binary);
+                database->loadBMultiTSV(ifile1);
                 break;
             default:
                 break;
@@ -220,10 +243,19 @@ int main(int argc, const char * argv[]) {
             cout<<"load use"<<(double)(finishTime-startTime)/CLOCKS_PER_SEC<<endl;
         }
     }
-    if(saveStatus==1){
-        ofile1.open(pathSave);
+    if(saveStatus>0){
         cout<<"saving data to "<<pathSave<<endl;
-        database->outputMirror(ofile1);
+        switch (saveStatus) {
+            case 1:
+                ofile1.open(pathSave);
+                database->outputMirror(ofile1);
+                break;
+            case 2:
+                ofile1.open(pathSave,ios::binary);
+                database->outputBMirror(ofile1);
+            default:
+                break;
+        }
         ofile1.close();
     }
     if(actionStatus==-1){

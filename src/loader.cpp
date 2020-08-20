@@ -275,7 +275,7 @@ int loader::loadFromMirror(ifstream &ifile){
                 for(i=0;i<num;i++){
                     buf>>abdBuf.ID;
                     buf>>abdBuf.data;
-                    data->data.push_back(abdBuf);
+                    data->data[i]=abdBuf;
                 }
                 state=3;buf.clear();
                 break;
@@ -345,5 +345,74 @@ int loader::printToTable(ofstream &ofile){
     }
     delete []matrix[0];
     delete []matrix;
+    return 0;
+}
+int loader::loadBMultiTSV(ifstream &ifile){
+    SampleHead sHead;
+    Infos info;
+    char *buffer;
+    sampleData* sData;
+    buffer=new char[50];
+    ifile.read((char*)&(info.source),sizeof(info.source));
+    ifile.read(buffer,sizeof(info.version));
+    io.s2v(buffer, &(info.version));
+    ifile.read(buffer,sizeof(info.size));
+    io.s2v(buffer, &(info.size));
+    string sBuf;
+    int x=0;
+    for(int i=0;i<info.size;i++){
+        ifile.read((char*)&(sHead.Name),sizeof(sHead.Name));
+        ifile.read(buffer,sizeof(sHead.sampleSize));
+        io.s2v(buffer,&(sHead.sampleSize));
+        abdElement ABDbuf;
+        if(x==0)
+            sData=new sampleData[100];
+        sData[x].data.resize(sHead.sampleSize);
+        for(int j=0;j<sHead.sampleSize;j++){
+            ifile.read(buffer,sizeof(ABDbuf.ID));
+            io.s2v(buffer, &(ABDbuf.ID));
+            ifile.read(buffer,sizeof(ABDbuf.data));
+            io.s2v(buffer, &(ABDbuf.data));
+            sData[x].data[j]=ABDbuf;
+        }
+        sBuf=sHead.Name;
+        sData[x].name=sBuf;
+        Data[sBuf]=sData+x;
+        x+=1;
+        x=x==100?0:x;
+    }
+    delete [] buffer;
+    return 0;
+}
+int loader::outputBMirror(ofstream &ofile){
+    Infos info;
+    strcpy(info.source,"Meta-Prism 2.0");
+    char *buffer;
+    buffer=new char[50];
+    info.version=1.01;
+    info.size=Data.size();
+    ofile.write((char *)&info.source,sizeof(info.source));
+    io.v2s(buffer, &(info.version));
+    ofile.write(buffer,sizeof(info.version));
+    io.v2s(buffer, &(info.size));
+    ofile.write(buffer,sizeof(info.size));
+    SampleHead sHead;
+    this->genName();
+    for(auto iter=Data.begin();iter!=Data.end();iter++){
+        strcpy(sHead.Name,iter->second->name.c_str());
+        auto &sData=iter->second->data;
+        sHead.sampleSize=sData.size();
+        ofile.write((char *)&(sHead.Name),sizeof(sHead.Name));
+        io.v2s(buffer, &(sHead.sampleSize));
+        ofile.write(buffer,sizeof(sHead.sampleSize));
+        for(auto dIter=sData.begin();dIter!=sData.end();dIter++){
+            io.v2s(buffer, &(dIter->ID));
+            ofile.write(buffer,sizeof(dIter->ID));
+            io.v2s(buffer, &(dIter->data));
+            ofile.write(buffer,sizeof(dIter->data));
+        }
+    }
+    ofile.close();
+    delete [] buffer;
     return 0;
 }
