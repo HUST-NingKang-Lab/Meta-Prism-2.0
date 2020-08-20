@@ -380,9 +380,9 @@ searchResult* searchBoostCompare(class loader &A,class loader &B,int core,int to
     x=A.size();y=B.size();
     result->dataAlloc(B.size(),topN);
     A.genName();
-    cout<<"calculating "<<x<<'*'<<x<<" similarity matrix\n";
+    cout<<"searching "<<y<<" from "<<x<<" samples\n";
     auto pBar=new progressBar;
-    pBar->init(x*x);
+    pBar->init(x*y);
     if(core >1){
         pthread_t * tids;
         LineCompareArg * args;
