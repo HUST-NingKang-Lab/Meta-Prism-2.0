@@ -40,7 +40,7 @@ This command will open OTU file and read all samples, calculate the similarity m
 ### Database search:
 > Meta prism 2.0 can search one or more microbial samples for another group of microbial samples, and return the top n sample name with the highest similarity and similarity. Relevant args are:  
 ```
---search(-s) [single|list|OTU|ascii|binary] [search sample path] [select number] ## Load and search samples then return top N (default=5) similar samples
+--search(-s) [single|list|OTU|ascii|binary] [search sample path] [select number|f] ## Load and search samples then return top N (default=5, input char 'f' will return full result as matrix) similar samples
 --output(-o) [path] ## Result output path
 --threads(-T) [Number] ## Threads for calculathon
 ```

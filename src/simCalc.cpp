@@ -194,8 +194,6 @@ float* multiSparseCompare(float ** a,float**b,const CompData* compData,int sampl
             a[order_N][j]+=(a[order_1][j]-min_1[j])*dist_1+(a[order_2][j]-min_2[j])*dist_2;
             b[order_N][j]+=(b[order_1][j]-min_1[j])*dist_1+(b[order_2][j]-min_2[j])*dist_2;
         }
-        
-        
     }
     for(int j=0;j<sampleSize;j++)
     {
@@ -261,7 +259,19 @@ void *lineCompare(void * args){
             delete bResult;
             delete boost;
         }
-        else{
+        else if(arg->number<0) {
+            int x=arg->A->size();
+            auto boost=new booster(arg->A->p);
+            searchFullResult* result=(searchFullResult*)arg->result;
+            if(iter->second->data.size()==0){
+                delete boost;
+                continue;}
+            boost->setData(iter->second);
+            boost->convert(*(arg->A));
+            auto bResult=boost->calc();
+            result->sendResult(i,bResult);
+            delete bResult;delete boost;
+        }else{
             int j,topN=arg->number;
             int x=arg->A->size();
             auto boost=new booster(arg->A->p);
@@ -307,7 +317,6 @@ compareResult* matrixBoostCompare( class loader & A,int core,bool lowMem){
     A.genName();
     cout<<"calculating "<<x<<'*'<<x<<" similarity matrix\n";
     
-    if(core >1){
         pthread_t * tids;
         LineCompareArg * args;
         tids=new pthread_t[core];
@@ -320,21 +329,7 @@ compareResult* matrixBoostCompare( class loader & A,int core,bool lowMem){
         for(int i=0;i<core;i++)
             pthread_join(tids[i], NULL);
         delete []tids;delete []args;
-    }
-    else{
-        auto iterI=A.Data.begin();
-        for(i=0;i<x;i++,iterI++){
-            boost=new booster(A.p);
-            if(iterI->second->data.size()==0)
-                continue;
-            boost->setData(iterI->second);
-            boost->convert(A,i+1);
-            auto bResult=boost->calc();
-            result->sendResult(i, bResult);
-            delete bResult;
-            delete boost;
-            
-        }}
+    
     result->nameA=A.names;
     cout<<endl;
     return result;
@@ -368,7 +363,34 @@ compareResult* searchCompare( class loader &A,  class loader &B, int core){
     
     return result;
 }
-
+searchFullResult* fullSearchBoostCompare(class loader &A,class loader &B,int core,bool lowMem) {
+    searchFullResult*result;
+    booster * boost;
+    int x,y,i,j;
+    if(core <1){
+        cout<<"Warning, CPU cores must >=1, we except you select 1\n";
+        core=1;}
+    result=new searchFullResult;
+    x=B.size();y=A.size();
+    result->dataAlloc(x,y,lowMem);
+    A.genName();B.genName();
+    result->nameA=A.names;result->nameB=B.names;
+    cout<<"searching "<<x<<" from "<<y<<" samples\n";
+        pthread_t * tids;
+        LineCompareArg * args;
+        tids=new pthread_t[core];
+        args=new LineCompareArg[core];
+        for(int i=0;i<core;i++){
+            args[i].A=&A;args[i].B=&B;args[i].core=core;
+            args[i].id=i;args[i].result=(compareResult*)result;args[i].number=-1;
+            pthread_create(&(tids[i]), NULL, lineCompare, (void*)&(args[i]));
+        }
+        for(int i=0;i<core;i++)
+            pthread_join(tids[i], NULL);
+        delete []tids;delete []args;
+    
+    return result;
+}
 searchResult* searchBoostCompare(class loader &A,class loader &B,int core,int topN){
     searchResult*result;
     booster * boost;
@@ -383,7 +405,6 @@ searchResult* searchBoostCompare(class loader &A,class loader &B,int core,int to
     cout<<"searching "<<y<<" from "<<x<<" samples\n";
     auto pBar=new progressBar;
     pBar->init(x*y);
-    if(core >1){
         pthread_t * tids;
         LineCompareArg * args;
         tids=new pthread_t[core];
@@ -396,32 +417,7 @@ searchResult* searchBoostCompare(class loader &A,class loader &B,int core,int to
         for(int i=0;i<core;i++)
             pthread_join(tids[i], NULL);
         delete []tids;delete []args;
-    }
-    else{
-        int m=0;auto iterI=B.Data.begin();
-        for(i=0;i<y;i++,iterI++){
-            
-            if(iterI->second->data.size()==0)
-                continue;
-            boost=new booster(A.p);
-            boost->setData(iterI->second);
-            boost->convert(A);
-            auto bResult=boost->calc();
-            vector<struct index_value> datas;
-            datas.resize(x);
-            for(j=0;j<x;j++){
-                //cout<<i<<' '<<j<<endl;
-                datas[j].index=j;
-                datas[j].value=bResult[j];
-            }
-            pBar->show(x);
-            partial_sort(datas.begin(), datas.begin()+topN, datas.end(),i_v_cmp);
-            for(j=0;j<topN;j++)
-                result->data[i][j]=datas[j];
-            delete bResult;
-            delete boost;
-            
-        }}
+    
     delete pBar;
     //result->nameA=A.names;
     return result;

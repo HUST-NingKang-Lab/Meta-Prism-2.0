@@ -45,7 +45,7 @@ void ArgParser::printHelp(){
     <<"--load(-l) + [list|OTU|ascii|binary] + [path]: load datas from different types\n\n"
     
     <<"--matrix(-m) : computing similarity matrix\n"
-    <<"--search(-s) + [single|list|OTU|ascii|binary] +[search sample path] + [select number]: load and search samples then return top N (default=5) similar samples\n\n"
+    <<"--search(-s) + [single|list|OTU|ascii|binary] +[search sample path] + [select number|f]: Load and search samples then return top N (default=5, input char 'f' will return full result as matrix) similar samples\n\n"
     
     <<"--output(-o) [path]: path to output calculation result\n"
     <<"--package(-p) [ascii|binary] [path]: save package of loaded file\n"
@@ -87,7 +87,6 @@ int main(int argc, const char * argv[]) {
     int threads=1,topN=5;
     ifstream ifile1,ifile2;ofstream ofile1,ofile2;
     bool testFlag=false,lowMemory=true;
-    compareResult* result=nullptr;searchResult*result2=nullptr;
     string pathBuffer,buffer;
     //string pathTree,pathLoad,pathSample,pathOut,pathSave,pathConvert,pathOutTree,pathOutOrder;
     parser *p = nullptr;loader *database,*sample;
@@ -174,11 +173,11 @@ int main(int argc, const char * argv[]) {
     if((arg_buf=aP.get("--threads","-T"))){
         buffer=(*arg_buf)[0];
         threads=1;}
+    uFP16 d;
+    lowMemory=d.check();
+    if(!lowMemory)
+        cout<<"\nCompiler or device don't follow IEEE854, can't use low memory mode"<<endl;
     if(aP.get("-m","--matrix")){
-        uFP16 d;
-        lowMemory=d.check();
-        if(!lowMemory)
-            cout<<"\nCompiler or device don't follow IEEE854, can't use low memory mode"<<endl;
         if((arg_buf=aP.get("-o","--output"))){
             ;
         }else{
@@ -186,7 +185,7 @@ int main(int argc, const char * argv[]) {
                 cout<<"\nWarning, execute matrix comparison but didn't give a output path\nMeta-Prism 2.0 will skip save step\n";
         }
         
-        result=matrixBoostCompare(*database,threads,lowMemory);
+        auto result=matrixBoostCompare(*database,threads,lowMemory);
         if(testFlag)
             cout<<"skip save step"<<endl;
         else{
@@ -223,8 +222,12 @@ int main(int argc, const char * argv[]) {
             return 0;
         }
         ifile2.close();
-        if(arg_buf->size()>2)
-            topN=atoi((*arg_buf)[2].c_str());
+        if(arg_buf->size()>2){
+            buffer=(*arg_buf)[2];
+            if(buffer[0]=='f')
+                topN=-1;
+                else
+            topN=atoi((*arg_buf)[2].c_str());}
         else
             topN=5;
         if((arg_buf=aP.get("-o","--output"))){
@@ -233,28 +236,29 @@ int main(int argc, const char * argv[]) {
             if(!testFlag)
                 cout<<"\nWarning, execute matrix comparison but didn't give a output path\nMeta-Prism 2.0 will skip save step\n";
         }
-        result2 = searchBoostCompare(*database, *sample, threads, topN);
-        if(testFlag)
-            cout<<"skip save step"<<endl;
-        else{
-            pathBuffer=(*arg_buf)[0];
-            ofile1.open(pathBuffer);
-            cout<<"\nSaving calculation result to: "<<pathBuffer<<endl;
-            sample->genName();
-            database->genName();
-            auto Dnames=database->names;
-            auto Snames=sample->names;
-            for(int i=0;i<sample->size();i++){
-                ofile1<<Snames[i]<<" :";
-                for(int j=0;j<topN;j++){
-                    auto name=Dnames[result2->data[i][j].index];
-                    ofile1<<' '<<name<<':'<<result2->data[i][j].value;
-                    if(j!=topN)
-                        ofile1<<',';
+        if(topN>=0){
+            auto result = searchBoostCompare(*database, *sample, threads, topN);
+            if (testFlag)
+                cout << "skip save step" << endl;
+            else {
+                pathBuffer = (*arg_buf)[0];
+                ofile1.open(pathBuffer);
+                cout << "\nSaving calculation result to: " << pathBuffer << endl;
+                sample->genName();
+                database->genName();
+                result->save(ofile1,database->names,sample->names);
+                ofile1.close();
+            }}else{
+                auto result=fullSearchBoostCompare(*database, *sample, threads, lowMemory);
+                if (testFlag)
+                    cout << "skip save step" << endl;
+                else {
+                    pathBuffer = (*arg_buf)[0];
+                    ofile1.open(pathBuffer);
+                    cout << "\nSaving calculation result to: " << pathBuffer << endl;
+                    result->save(ofile1);
                 }
-                ofile1<<endl;
             }
-        }
     }if((arg_buf=aP.get("--convertOTU"))){
         pathBuffer=(*arg_buf)[0];
         ofile1.open(pathBuffer);

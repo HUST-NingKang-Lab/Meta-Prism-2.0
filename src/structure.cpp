@@ -88,3 +88,72 @@ int compareResult::sendResult(int i,float* result){
     pthread_mutex_unlock(&showLock);
     return 0;
 }
+int searchResult::save(ofstream &ofile,vector<string>& DNames,vector<string>&SNames) {
+    for (int i = 0; i < SNames.size(); i++) {
+        ofile << SNames[i] << " :";
+        for (int j = 0; j < topN; j++) {
+            auto name = DNames[this->data[i][j].index];
+            ofile << ' ' << name << ':' << this->data[i][j].value;
+            if (j != topN)
+                ofile << ',';
+        }
+        ofile << endl;
+    }
+    return 0;
+}
+int searchFullResult::dataAlloc(int x,int y,bool lowFlag){
+    this->x=x;this->y=y;
+    lowMem=lowFlag;
+    if (lowFlag)
+        return this->alloc(x,y, &(this->data16));
+    else
+        return this->alloc(x,y, &(this->data));
+}
+template<typename T>
+int searchFullResult::alloc(int x,int y, T ***sData){
+    auto genData=new T*[x];
+    for (int i=0;i<x;i++){
+        genData[i]=new T[y];
+    }
+    *sData=genData;
+    pBar.init(x*y);
+    pthread_mutex_init(&showLock,NULL);
+    return 0;
+}
+template<typename T>
+int searchFullResult::output(ofstream &ofile,T** sData){
+    int i,j;
+    for(i=0;i<x;i++){
+        ofile<<nameB[i]<<' ';
+        for(j=0;j<y;j++){
+            ofile<<(sData[i][j])<<' ';
+        }
+        ofile<<endl;
+    }
+    return 0;
+}
+int searchFullResult::sendResult(int i,float* result){
+    if(lowMem){
+        for(int t=0;t<y;t++)
+            data16[i][t]=result[t];
+    }
+    else{
+        for(int t=0;t<y;t++)
+            data[i][t]=result[t];
+    }
+    pthread_mutex_lock(&showLock);
+    pBar.show(y);
+    pthread_mutex_unlock(&showLock);
+    return 0;
+}
+int searchFullResult::save(ofstream &ofile){
+    ofile<<this->x<<endl;
+    for (auto iter=nameA.begin();iter!=nameA.end();iter++){
+        ofile<<*iter<<' ';
+    }
+    ofile<<endl;
+    if(lowMem)
+        return this->output(ofile, data16);
+    else
+        return this->output(ofile, data);
+}

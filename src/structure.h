@@ -253,7 +253,6 @@ public:
 
 class searchResult{
 public:
-    
     int x,topN;
     index_value **data;
     int dataAlloc(int x,int topN){
@@ -269,6 +268,38 @@ public:
         delete [] data[0];
         delete [] data;
     }
+    int save(ofstream &ofile,vector<string>& DNames,vector<string>&SNames) ;
 };
-
+class searchFullResult{
+private:
+    template <typename T>
+    int alloc(int x,int y,T*** sData);
+    template <typename T>
+    int output(ofstream &ofile,T** sData);
+    pthread_mutex_t showLock;
+public:
+    int x,y;
+    progressBar pBar;
+    bool big=false,lowMem=false;
+    vector<string> nameA,nameB;
+    float **data;
+    uFP16 **data16;
+    int load(ifstream &ifile);
+    int save(ofstream &ofile);
+    ~searchFullResult(){
+        if (lowMem){
+            for(int i=0;i<x;i++)
+                delete[] data16[i];
+            delete [] data16;
+        }
+        else{
+            for(int i=0;i<x;i++)
+                delete[] data[i];
+            delete [] data;
+        }
+        return;
+    }
+    int dataAlloc(int x,int y,bool lowFlag=false);
+    int sendResult(int i,float* result);
+};
 #endif /* structure_h */
