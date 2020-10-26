@@ -8,7 +8,7 @@
 
 #ifndef sparseSimCalc_hpp
 #define sparseSimCalc_hpp
-
+#include <immintrin.h>
 #include "structure.h"
 #include "loader.hpp"
 #include <stdio.h>

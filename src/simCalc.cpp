@@ -173,26 +173,47 @@ float denseSimCalcPair(const sampleData &a,const sampleData &b,const CompData* c
 float* multiSparseCompare(float ** a,float**b,const CompData* compData,int sampleSize,int orderSize){
     float *result;
     int order_1=0,order_2=0,order_N=0;float dist_1,dist_2;
-    float *min_1,*min_2;// *c1_1,*c1_2,*c2_1,*c2_2,
+    //float *min_1,*min_2;// *c1_1,*c1_2,*c2_1,*c2_2,
     result=new float[sampleSize]();/*
                                     c1_1=new float[sampleSize]();
                                     c1_2=new float[sampleSize]();
                                     c2_1=new float[sampleSize]();
                                     c2_2=new float[sampleSize]();*/
-    min_1=new float[sampleSize]();
-    min_2=new float[sampleSize]();
+    //min_1=new float[sampleSize]();
+    //min_2=new float[sampleSize]();
     for(int i=0;i<orderSize;i++){
         order_1=compData->order_1[i];
         order_2=compData->order_2[i];
         order_N=compData->order_N[i];
         dist_1=1-compData->dist_1[i];
         dist_2=1-compData->dist_2[i];
-        for(int j=0;j<sampleSize;j++){
-            min_1[j]=min(a[order_1][j],b[order_1][j]);
-            min_2[j]=min(a[order_2][j],b[order_2][j]);
-            result[j]+=min_1[j]+min_2[j];
-            a[order_N][j]+=(a[order_1][j]-min_1[j])*dist_1+(a[order_2][j]-min_2[j])*dist_2;
-            b[order_N][j]+=(b[order_1][j]-min_1[j])*dist_1+(b[order_2][j]-min_2[j])*dist_2;
+        int j,step,AVXStep=sampleSize/8;
+        for(step=0;step<AVXStep;step++){
+            j=step*8;
+            __m256 _min1,_min2,_a_1,_a_2,_b_1,_b_2,_result;
+            _a_1=_mm256_loadu_ps(a[order_1]+j);
+            _a_2=_mm256_loadu_ps(a[order_2]+j);
+            _b_1=_mm256_loadu_ps(b[order_1]+j);
+            _b_2=_mm256_loadu_ps(b[order_2]+j);
+            _min1=_mm256_min_ps(_a_1, _b_1);
+            _min2=_mm256_min_ps(_a_2, _b_2);
+            _result=_mm256_loadu_ps(result+j);
+            //_result=_mm256_add_ps(_min1, _min2);
+            _mm256_storeu_ps(result+j, _mm256_add_ps(_result, _mm256_add_ps(_min1, _min2)));
+            _a_2=_mm256_add_ps((_mm256_sub_ps(_a_1, _min1)*dist_1), (_mm256_sub_ps(_a_2, _min2)*dist_2));
+            _a_1=_mm256_loadu_ps(a[order_N]+j);
+            _mm256_storeu_ps(a[order_N]+j, _mm256_add_ps(_a_2, _a_1));
+            _b_2=_mm256_add_ps((_mm256_sub_ps(_b_1, _min1)*dist_1), (_mm256_sub_ps(_b_2, _min2)*dist_2));
+            _b_1=_mm256_loadu_ps(b[order_N]+j);
+            _mm256_storeu_ps(b[order_N]+j,  _mm256_add_ps(_b_2, _b_1));
+        }
+        for(j=AVXStep*8;j<sampleSize;j++)
+        {
+            auto min_1=min(a[order_1][j],b[order_1][j]);
+            auto min_2=min(a[order_2][j],b[order_2][j]);
+            result[j]+=min_1+min_2;
+            a[order_N][j]+=(a[order_1][j]-min_1)*dist_1+(a[order_2][j]-min_2)*dist_2;
+            b[order_N][j]+=(b[order_1][j]-min_1)*dist_1+(b[order_2][j]-min_2)*dist_2;
         }
     }
     for(int j=0;j<sampleSize;j++)
@@ -202,7 +223,6 @@ float* multiSparseCompare(float ** a,float**b,const CompData* compData,int sampl
         result[j]=min(result[j],(float)1);
         result[j]=max(result[j],(float)0);
     }
-    delete[] min_2;delete []min_1;
     return result;
 }
 

@@ -172,7 +172,7 @@ int main(int argc, const char * argv[]) {
     }
     if((arg_buf=aP.get("--threads","-T"))){
         buffer=(*arg_buf)[0];
-        threads=1;}
+        threads=atoi(buffer.c_str());}
     uFP16 d;
     lowMemory=d.check();
     if(!lowMemory)
