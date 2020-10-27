@@ -187,7 +187,9 @@ float* multiSparseCompare(float ** a,float**b,const CompData* compData,int sampl
         order_N=compData->order_N[i];
         dist_1=1-compData->dist_1[i];
         dist_2=1-compData->dist_2[i];
-        int j,step,AVXStep=sampleSize/8;
+        int j,step,AVXStep=0;
+#ifdef __MP2_useAVX__
+        AVXStep=sampleSize/8;
         for(step=0;step<AVXStep;step++){
             j=step*8;
             __m256 _min1,_min2,_a_1,_a_2,_b_1,_b_2,_result;
@@ -207,6 +209,7 @@ float* multiSparseCompare(float ** a,float**b,const CompData* compData,int sampl
             _b_1=_mm256_loadu_ps(b[order_N]+j);
             _mm256_storeu_ps(b[order_N]+j,  _mm256_add_ps(_b_2, _b_1));
         }
+#endif
         for(j=AVXStep*8;j<sampleSize;j++)
         {
             auto min_1=min(a[order_1][j],b[order_1][j]);

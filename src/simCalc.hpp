@@ -8,7 +8,12 @@
 
 #ifndef sparseSimCalc_hpp
 #define sparseSimCalc_hpp
+#ifdef __AVX__
 #include <immintrin.h>
+#define __MP2_useAVX__ 1
+#else
+#define __MP2_Normal__ 1
+#endif
 #include "structure.h"
 #include "loader.hpp"
 #include <stdio.h>

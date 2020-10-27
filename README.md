@@ -1,9 +1,9 @@
 # README
 # Meta-Prism 2.0
 ## Introduction
-Meta prism 2.0 is a faster microbiome sample comparison and search software. It default use [Silva phylogeny tree](https://www.arb-silva.de) and support [EBI MGNify data](https://www.ebi.ac.uk/metagenomics/). It also supports custom sequencing evolutionary trees. It can calculate the similarity matrix of microbiome samples and search the microbiome database. Because of the improvement of calculation performance compared with [Meta-Prism 1.0](https://github.com/HUST-NingKang-Lab/metaPrism), 2.0 doesn’t need index system and execute exhaustive search.
+Meta-prism 2.0 is a faster microbiome sample comparison and search software. It default use [Silva phylogeny tree](https://www.arb-silva.de) and support [EBI MGNify data](https://www.ebi.ac.uk/metagenomics/). It also supports custom sequencing evolutionary trees. It can calculate the similarity matrix of microbiome samples and search the microbiome database. Because of the improvement of calculation performance compared with [Meta-Prism 1.0](https://github.com/HUST-NingKang-Lab/metaPrism), 2.0 doesn’t need index system and execute exhaustive search.
 ## Requirement
-Our project require gcc 4.8.5 or higher. And we successfully compiled on CentOS 7.6 and macOS 10.15
+We successfully compiled on CentOS 7.6 by gcc 4.8.5 and macOS 10.15 by clang 11.0.0
 ## Install and Build
 ### Use git clone to download the source code:
 `git clone https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0.git`
@@ -13,17 +13,18 @@ Our project require gcc 4.8.5 or higher. And we successfully compiled on CentOS 
 `make clean`
 ## Usage
 ### Prepare phylogeny tree:
-Meta prism 2.0 needs the evolutionary tree of Newick format as the basis of calculation. It is recommended to use Silva evolutionary tree, or set the evolutionary tree according to the sequencing results or use requirements. Use`  -t [path]` or `--tree [path] ` to select the evolutionary tree path.
+Meta prism 2.0 needs the evolutionary tree of Newick format as the basis of calculation. It is recommended to use Silva evolutionary tree, or set the evolutionary tree according to the sequencing results or use requirements. Use  `  -t [path]` or `--tree [path] `   to select the evolutionary tree path.
 ### Load data:
 Meta prism 2.0 supports SSU abundance data files in EBI MGNify and other databases as input, and provides special packaged data format with two types: ascii and binary to store abundance more efficiently. Note that packaged data is bound to the specific evolution tree. 
 
 `--load(-l) [list|OTU|ascii|binary] [path]`
 ### Package data:
-Meta prism 2.0 can package texa data with by ascii or binary. Ascii format packaged data is easy to read and edit, while binary format data take less space and can be load fast.
+Meta prism 2.0 can package texa data with by ascii or binary for space efficient storage and fast loading.
+Ascii format packaged data is easy to read and edit, while binary format data is more efficient at space and time.
 
 `--package(-p) [ascii|binary] [path]`
 
-Note that the packaged data is bound to the evolution tree and cannot be used on another evolution tree.
+Note that the packaged data is bound to the evolution tree and cannot be used with another evolution tree.
 ### Calculate similarity matrix:
 Meta prism 2.0 can load the data of microbiome samples and calculate the similarity matrix between samples. 
 ```
@@ -54,8 +55,10 @@ Multiple samples can be read from the packaged file with ascii type as the datab
 We provide Silva tree data, SSU_ TSV data, ascii packaged data for example.
 
 [Silva phylogenetic tree](https://www.arb-silva.de/fileadmin/silva_databases/living_tree/LTP_release_132/LTPs132_SSU_tree.newick) (need to delete description head first)
+  or [local backup](https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/download/datas/LTPs132_SSU_tree.txt)
 
-[SSU_OTUs data](https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/download/v1.0-with-data/MGYS00000337-ERR358543.tsv)
+[SSU_OTUs data](https://www.ebi.ac.uk/metagenomics/api/v1/analyses/MGYA00001775/file/ERR358543_FASTQ_otu.tsv)
+or [local backup](https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/download/v1.0-with-data/MGYS00000337-ERR358543.tsv)
 
 [100 samples ascii packaged data](https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/download/datas/100samples.ascii_packaged.pdata)
 
@@ -69,7 +72,15 @@ Following are the datasets we used for evaluate our method:
 
 [FEAST dataset ascii packaged](https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/download/datas/FEAST_dataset.ascii_packaged.pdata)
 
-## Author
-康凯 Kai Kang  kang_kai_kk@icloud.com
+## Note
+* Many phylogenetic tree has notation in file, including silva phylogenetic tree. You need to delete notations before running program.
+* Our packaged data format is combined with phylogenetic tree. After you packaged samples from one tree, you can't calculate this data with another tree.
 
-宁康 Kang Ning  ningkang@hust.edu.cn
+## Contact
+康凯 Kai Kang 
+ 
+kang_kai_kk@icloud.com
+
+宁康 Kang Ning
+  
+ningkang@hust.edu.cn

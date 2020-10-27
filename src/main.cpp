@@ -90,7 +90,13 @@ int main(int argc, const char * argv[]) {
     string pathBuffer,buffer;
     //string pathTree,pathLoad,pathSample,pathOut,pathSave,pathConvert,pathOutTree,pathOutOrder;
     parser *p = nullptr;loader *database,*sample;
-    cout << "Welcome to using meta-prism 2.0\n";
+    cout << "Welcome to using meta-prism 2.0";
+#ifdef __MP2_Normal__
+    cout<<" normal model\n";
+#endif
+#ifdef __MP2_useAVX__
+    cout<<" AVX model\n";
+#endif
     if(aP.parse(argc, argv)<0){
         cout<<"Command line args error\n";
         aP.printHelp();
