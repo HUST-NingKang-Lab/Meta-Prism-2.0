@@ -5,6 +5,10 @@
 //  Created by 康凯 on 2019/12/23.
 //  Copyright © 2019 康凯. All rights reserved.
 //
+
+/*
+  following is main structures used in Meta-Prism 2.0
+ */
 #include <string>
 #include <sstream>
 #include <iostream>
@@ -59,83 +63,14 @@ struct index_value{
     float value;
     
 };
-struct waitElement{
-    int dep,id;
-};
-class NewMap{
-public:
-    bool empty,nEmpty;
-    NewMap(int depth){
-        this->depth=depth;
-        nums=new int[depth+1]();index=new int[depth+1]();
-        sum=0;
-        empty=false;
-    }
-    inline void send(int dep,int id){
-        sum++;nums[dep]++;
-        waitElement a;
-        a.dep=dep;a.id=id;
-        inputs.push_back(a);
-    }
-    bool calculate(){
-        int sumUp=0;
-        for(int i=depth;i>=0;i--){
-            index[i]=sumUp;
-            sumUp+=nums[i];
-        }
-        data=new int [sumUp+1]();
-        for (auto m=inputs.begin();m!=inputs.end();m++){
-            data[index[m->dep]++]=m->id;
-        }
-        iter=depth-1;ptr=index[iter]-1;
-        return true;
-    }
-    bool get(int &id){
-        nIter=iter;nEmpty=empty;
-        sum--;
-        if(ptr<index[iter+1]){
-            if(iter==0 || sum==0)
-                empty=true;
-            else {
-                iter--;
-                while(index[iter+1]==index[iter])
-                    iter--;
-            }
-            ptr=index[iter]-1;
-        }
-        id=data[ptr--];
-        return true;
-    }
-    bool add(int id){
-        sum++;
-        nIter=iter;
-        if(index[nIter]<ptr){
-            cout<<"New map error\n";
-            return false;
-        }
-        else
-            data[--index[nIter]]=id;
-        return true;
-    }
-    ~NewMap(){
-        delete nums;
-        delete data;
-        delete index;
-        return;
-    }
-private:
-    int *nums,*data,depth,*index,ptr,sum,iter,nIter;
-    vector<waitElement> inputs;
-};
 
 class uFP16{
-    //Storage Result
-    //Value is between 0~1
-    //first 6 bit exponent
-    //last 10 bit fraction
-    const static uint32_t exp=4,shiftExp=23,frac=16-exp,shiftFrac=shiftExp-frac;
-    static uint32_t getFrac;//0x7FF;
-    static uint32_t Zero;
+    //Space efficient method to save similarity matrix result, just take 16 bit. But this need compiler and platform follow IEEE854
+    //Since similarity value is between 0~1, we can save two sign bits from exponent and fraction
+    //first [exp] bit for exponent
+    //last 16-[exp] bit for fraction
+    const static uint32_t exp=4,shiftExp=23,frac=16-exp,shiftFrac=shiftExp-frac;// user can change [exp] by their self, but it's not recommanded
+    static uint32_t getFrac,Zero;//these will be calculated based on exp
     const static uint32_t getExp=0x0000FF;
     const static uint32_t Min=0;
     const static uint32_t Head=(0x1)<<29;
@@ -146,46 +81,19 @@ class uFP16{
         uint32_t ui;
     };
 private:
-    uint16_t data;
+    uint16_t data;// take 16 bit for storage
 public:
     uFP16(){
         data=Zero;
     }
-    void inline operator =(const float & value);
-    inline operator float();
-    bool check();
+    void inline operator =(const float & value);//take 32 bit float input and convert to 16 bit FP
+    inline operator float();//convert 16 bit FP to 32 bit float
+    bool check();// use some value to check wether compiler and platform follow IEEE854
 };
 
-void uFP16::operator=(const float &value)
-{
-    uFP16::Bits f,e;
-    e.f=value;
-    e.ui=e.ui>>shiftExp;
-    e.ui&=getExp;
-    e.ui=127-e.ui;
-    if(e.ui>>exp){
-        data=Zero;
-        return;
-    }
-    e.ui<<=frac;
-    f.f=value;
-    f.ui>>=shiftFrac;
-    f.ui &= getFrac;
-    data=e.ui^f.ui;
-    return;
-}
-uFP16::operator float(){
-    uFP16::Bits e,f;
-    f.ui=data&getFrac;
-    f.ui=f.ui<<shiftFrac;
-    e.ui=(data>>frac);
-    e.ui=(127-e.ui);
-    e.ui=e.ui<<shiftExp;
-    e.ui=f.ui^e.ui;
-    return e.f;
-}
 ostream  &operator<<(ostream &out, uFP16 &c1);
-class progressBar{
+
+class progressBar{// It can show calculation progress for users, but still have some bug
 public:
     uint64_t value,all;
     float percent;
@@ -213,7 +121,7 @@ public:
     }
 };
 
-class compareResult{
+class matrixModeResult{//
 private:
     template <typename T>
     int alloc(int x,T*** sData);
@@ -230,7 +138,7 @@ public:
     uFP16 **data16;
     int load(ifstream &ifile);
     int save(ofstream &ofile);
-    ~compareResult(){
+    ~matrixModeResult(){
         if (lowMem){
             for(int i=0;i<x;i++)
                 delete[] data16[i];
@@ -270,7 +178,7 @@ public:
     }
     int save(ofstream &ofile,vector<string>& DNames,vector<string>&SNames) ;
 };
-class searchFullResult{
+class searchModeFullResult{
 private:
     template <typename T>
     int alloc(int x,int y,T*** sData);
@@ -286,7 +194,7 @@ public:
     uFP16 **data16;
     int load(ifstream &ifile);
     int save(ofstream &ofile);
-    ~searchFullResult(){
+    ~searchModeFullResult(){
         if (lowMem){
             for(int i=0;i<x;i++)
                 delete[] data16[i];

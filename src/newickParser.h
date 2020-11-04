@@ -2,6 +2,11 @@
 // Created by LuoFan  on 2019-12-19.
 //
 
+/*
+ newickParser.cpp: parsing newick format phylogenic tree and output informations of tree
+ 
+ */
+
 
 
 
@@ -10,12 +15,12 @@
 #define SRC_NEWICKPARSER_H
 #include "structure.h"
 using namespace std;
-class parser{
+class parser{// newick format phylogenic tree parser
 protected:
     TreeNode tree;// evolutional tree
     int treeSize,leafNumber,depth;
-    unordered_map<string,int> label;// name to id
-    unordered_map<int, TreeNode*> index;//id to name
+    unordered_map<string,int> label;// node name to node id
+    unordered_map<int, TreeNode*> index;//node id to node name
     void parseOne(char* newick,int &index,int end,TreeNode &node,int mod);
     void nameTravel(TreeNode& node,int &ID);
     void genTable(TreeNode &node, int depth);

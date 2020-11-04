@@ -7,24 +7,33 @@
 //
 
 #include "structure.h"
-int compareResult::save(ofstream &ofile){
-    ofile<<this->x<<endl;
-    for (auto iter=nameA.begin();iter!=nameA.end();iter++){
-        
-        ofile<<*iter<<' ';
+void uFP16::operator=(const float &value)
+{
+    uFP16::Bits f,e;
+    e.f=value;
+    e.ui=e.ui>>shiftExp;
+    e.ui&=getExp;
+    e.ui=127-e.ui;
+    if(e.ui>>exp){
+        data=Zero;
+        return;
     }
-    ofile<<endl;
-    if(lowMem)
-        return this->output(ofile, data16);
-    else
-        return this->output(ofile, data);
+    e.ui<<=frac;
+    f.f=value;
+    f.ui>>=shiftFrac;
+    f.ui &= getFrac;
+    data=e.ui^f.ui;
+    return;
 }
-int compareResult::dataAlloc(int x,bool lowFlag){
-    lowMem=lowFlag;
-    if (lowFlag)
-        return this->alloc(x, &(this->data16));
-    else
-        return this->alloc(x, &(this->data));
+uFP16::operator float(){
+    uFP16::Bits e,f;
+    f.ui=data&getFrac;
+    f.ui=f.ui<<shiftFrac;
+    e.ui=(data>>frac);
+    e.ui=(127-e.ui);
+    e.ui=e.ui<<shiftExp;
+    e.ui=f.ui^e.ui;
+    return e.f;
 }
 bool uFP16::check()
 {
@@ -49,8 +58,28 @@ ostream  &operator<<(ostream &out, uFP16 &c1){
     out<<(float)c1;
     return out;
 }
+
+int matrixModeResult::save(ofstream &ofile){
+    ofile<<this->x<<endl;
+    for (auto iter=nameA.begin();iter!=nameA.end();iter++){
+        
+        ofile<<*iter<<' ';
+    }
+    ofile<<endl;
+    if(lowMem)
+        return this->output(ofile, data16);
+    else
+        return this->output(ofile, data);
+}
+int matrixModeResult::dataAlloc(int x,bool lowFlag){
+    lowMem=lowFlag;
+    if (lowFlag)
+        return this->alloc(x, &(this->data16));
+    else
+        return this->alloc(x, &(this->data));
+}
 template<typename T>
-int compareResult::alloc(int x, T ***sData){
+int matrixModeResult::alloc(int x, T ***sData){
     auto genData=new T*[x];
     for (int i=0;i<x;i++){
         genData[i]=new T[x-i];
@@ -61,7 +90,7 @@ int compareResult::alloc(int x, T ***sData){
     return 0;
 }
 template<typename T>
-int compareResult::output(ofstream &ofile,T** sData){
+int matrixModeResult::output(ofstream &ofile,T** sData){
     int i,j;
     for(i=0;i<x;i++){
         for(j=0;j<i;j++){
@@ -74,7 +103,7 @@ int compareResult::output(ofstream &ofile,T** sData){
     }
     return 0;
 }
-int compareResult::sendResult(int i,float* result){
+int matrixModeResult::sendResult(int i,float* result){
     if(lowMem){
         for(int t=0;t<(x-i-1);t++)
             data16[i][t]=result[t];
@@ -88,6 +117,9 @@ int compareResult::sendResult(int i,float* result){
     pthread_mutex_unlock(&showLock);
     return 0;
 }
+
+
+
 int searchResult::save(ofstream &ofile,vector<string>& DNames,vector<string>&SNames) {
     for (int i = 0; i < SNames.size(); i++) {
         ofile << SNames[i] << " :";
@@ -101,7 +133,9 @@ int searchResult::save(ofstream &ofile,vector<string>& DNames,vector<string>&SNa
     }
     return 0;
 }
-int searchFullResult::dataAlloc(int x,int y,bool lowFlag){
+
+
+int searchModeFullResult::dataAlloc(int x,int y,bool lowFlag){
     this->x=x;this->y=y;
     lowMem=lowFlag;
     if (lowFlag)
@@ -110,7 +144,7 @@ int searchFullResult::dataAlloc(int x,int y,bool lowFlag){
         return this->alloc(x,y, &(this->data));
 }
 template<typename T>
-int searchFullResult::alloc(int x,int y, T ***sData){
+int searchModeFullResult::alloc(int x,int y, T ***sData){
     auto genData=new T*[x];
     for (int i=0;i<x;i++){
         genData[i]=new T[y];
@@ -121,7 +155,7 @@ int searchFullResult::alloc(int x,int y, T ***sData){
     return 0;
 }
 template<typename T>
-int searchFullResult::output(ofstream &ofile,T** sData){
+int searchModeFullResult::output(ofstream &ofile,T** sData){
     int i,j;
     for(i=0;i<x;i++){
         ofile<<nameB[i]<<' ';
@@ -132,7 +166,7 @@ int searchFullResult::output(ofstream &ofile,T** sData){
     }
     return 0;
 }
-int searchFullResult::sendResult(int i,float* result){
+int searchModeFullResult::sendResult(int i,float* result){
     if(lowMem){
         for(int t=0;t<y;t++)
             data16[i][t]=result[t];
@@ -146,7 +180,7 @@ int searchFullResult::sendResult(int i,float* result){
     pthread_mutex_unlock(&showLock);
     return 0;
 }
-int searchFullResult::save(ofstream &ofile){
+int searchModeFullResult::save(ofstream &ofile){
     ofile<<this->x<<endl;
     for (auto iter=nameA.begin();iter!=nameA.end();iter++){
         ofile<<*iter<<' ';

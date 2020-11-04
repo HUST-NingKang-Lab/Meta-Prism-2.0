@@ -1,6 +1,9 @@
 //
 // Created by 康凯 on 2019-12-19.
 //
+/*
+ main.cpp parsing the command line arguments and execute loading, calculating, saving functions
+ */
 #include <iostream>
 #include <fstream>
 #include<sstream>
@@ -10,7 +13,7 @@
 #include <time.h>
 using namespace std;
 
-class ArgParser{
+class ArgParser{// parsing the command line arguments
 public:
     void printHelp();
     unordered_map<string, vector<string>> args;
@@ -80,6 +83,8 @@ int ArgParser::parse(int argc,const char *argv[]){
     t++;
     return t;
 }
+
+
 int main(int argc, const char * argv[]) {
     // insert code here...
     ArgParser aP;
@@ -124,7 +129,8 @@ int main(int argc, const char * argv[]) {
         cout<<"Error, not defined newick tree path\n";
         return 0;
     }
-    if((arg_buf=aP.get("-l","--load"))){
+    
+    if((arg_buf=aP.get("-l","--load"))){// loading basic sample set
         database=new loader(p);
         pathBuffer=(*arg_buf)[1];
         cout<<"loading from "<<pathBuffer<<endl;
@@ -150,16 +156,17 @@ int main(int argc, const char * argv[]) {
         }
         ifile1.close();
     }
-        else{
+    else{
         cout<<"Error, not defined load database path\n";
         return 0;
     }
+    
     if(testFlag){
         finishTime=clock();
         cout<<"load use"<<(double)(finishTime-startTime)/CLOCKS_PER_SEC<<endl;
     }
     
-    if((arg_buf=aP.get("-p","--package"))){
+    if((arg_buf=aP.get("-p","--package"))){// package basic dataset as ascii format or binary format
         pathBuffer=(*arg_buf)[1];
         buffer=(*arg_buf)[0];
         cout<<"\npackaging data to "<<pathBuffer<<" as "<<buffer<<endl;
@@ -176,21 +183,23 @@ int main(int argc, const char * argv[]) {
         }
         ofile1.close();
     }
+    
     if((arg_buf=aP.get("--threads","-T"))){
         buffer=(*arg_buf)[0];
-        threads=atoi(buffer.c_str());}
+        threads=atoi(buffer.c_str());
+    }
+    
     uFP16 d;
     lowMemory=d.check();
+    
     if(!lowMemory)
         cout<<"\nCompiler or device don't follow IEEE854, can't use low memory mode"<<endl;
-    if(aP.get("-m","--matrix")){
-        if((arg_buf=aP.get("-o","--output"))){
-            ;
-        }else{
+    
+    if(aP.get("-m","--matrix")){// matrix mode: calculate and output the similarity matrix
+        if(!(arg_buf=aP.get("-o","--output"))){
             if(!testFlag)
                 cout<<"\nWarning, execute matrix comparison but didn't give a output path\nMeta-Prism 2.0 will skip save step\n";
         }
-        
         auto result=matrixBoostCompare(*database,threads,lowMemory);
         if(testFlag)
             cout<<"skip save step"<<endl;
@@ -201,9 +210,11 @@ int main(int argc, const char * argv[]) {
             result->save(ofile1);
         }
     }
-    if((arg_buf=aP.get("-s","--search"))){
+    
+    if((arg_buf=aP.get("-s","--search"))){// search mode: load another sample set and calcualte between two sets, then output TopN match or similarity matrix based on user
         pathBuffer=(*arg_buf)[1];
         buffer=(*arg_buf)[0];
+        
         sample=new loader(p);
         if(buffer=="list"){
             ifile2.open(pathBuffer);
@@ -222,15 +233,15 @@ int main(int argc, const char * argv[]) {
         }else if (buffer=="binary"){
             ifile2.open(pathBuffer,ios::binary);
             sample->loadBMultiTSV(ifile2);
-        }
-        else{
+        }else{
             cout<<"Error, undefined load type"<<buffer<<endl;
             return 0;
         }
         ifile2.close();
+        
         if(arg_buf->size()>2){
             buffer=(*arg_buf)[2];
-            if(buffer[0]=='f')
+            if(buffer[0]=='f')// if user send 'f', return full similarity matrix
                 topN=-1;
                 else
             topN=atoi((*arg_buf)[2].c_str());}
@@ -243,7 +254,7 @@ int main(int argc, const char * argv[]) {
                 cout<<"\nWarning, execute matrix comparison but didn't give a output path\nMeta-Prism 2.0 will skip save step\n";
         }
         if(topN>=0){
-            auto result = searchBoostCompare(*database, *sample, threads, topN);
+            auto result = searchBoostCompare(*database, *sample, threads, topN);// search and get Top N best match as result
             if (testFlag)
                 cout << "skip save step" << endl;
             else {
@@ -254,8 +265,9 @@ int main(int argc, const char * argv[]) {
                 database->genName();
                 result->save(ofile1,database->names,sample->names);
                 ofile1.close();
-            }}else{
-                auto result=fullSearchBoostCompare(*database, *sample, threads, lowMemory);
+            }
+        }else{
+                auto result=fullSearchBoostCompare(*database, *sample, threads, lowMemory);// search and output similarity matrix
                 if (testFlag)
                     cout << "skip save step" << endl;
                 else {
@@ -265,7 +277,10 @@ int main(int argc, const char * argv[]) {
                     result->save(ofile1);
                 }
             }
-    }if((arg_buf=aP.get("--convertOTU"))){
+    }
+    
+    //following functions are not shown in --help, because we think these are not frequently used
+    if((arg_buf=aP.get("--convertOTU"))){
         pathBuffer=(*arg_buf)[0];
         ofile1.open(pathBuffer);
         cout<<"Converting data to: "<<pathBuffer<<endl;

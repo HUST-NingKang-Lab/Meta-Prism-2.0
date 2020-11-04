@@ -24,17 +24,12 @@ struct LineCompareArg{
     int core=1;
     int number=0;
     bool lowMem=false;
-    compareResult * result=NULL;
+    matrixModeResult * result=NULL;
     loader *A=NULL,*B=NULL;
 };
-float sparseSimCalcPair(const sampleData &a,const sampleData &b,const Table* table);
-float sparseSimCalcNew(const sampleData &a,const sampleData &b,const Table* table,int depth);
-float denseSimCalcPair(const sampleData &a,const sampleData &b,const CompData* compData,int size,int depth);
 float * multiSparseCompare(float ** a,float**b,const CompData* compData,int sampleSize,int orderSize);
 void *lineCompare(void * args);
-compareResult* matrixCompare( loader & A);
-compareResult* matrixBoostCompare( loader & A,int core,bool lowMem);
-compareResult* searchCompare( loader &A,  loader &B,int core=1);
+matrixModeResult* matrixBoostCompare( loader & A,int core,bool lowMem);
 searchResult* searchBoostCompare(class loader &A,class loader &B,int core,int topN);
-searchFullResult* fullSearchBoostCompare(class loader &A,class loader &B,int core,bool lowMem) ;
+searchModeFullResult* fullSearchBoostCompare(class loader &A,class loader &B,int core,bool lowMem) ;
 #endif /* sparse_sim_calc_hpp */
