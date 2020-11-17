@@ -66,21 +66,27 @@ or [local backup](https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/d
 
 [file list for example](https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/download/datas/file_list_for_example.txt)
 
-Following are the datasets we used for evaluate our method:
+## Datasets used  in our study:
 
-[combined dataset binary packaged](https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/download/datas/Full_Combined_data.binary_packaged.pdata.zip)
-
-[FEAST dataset ascii packaged](https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/download/datas/FEAST_dataset.ascii_packaged.pdata)
+| Dataset             | Description                                                  | Source                                        | Link                                                         | Format            |
+| ------------------- | ------------------------------------------------------------ | --------------------------------------------- | ------------------------------------------------------------ | ----------------- |
+| Combined dataset    | 126,727 samples curated from MGnify database                 | [MGnify](https://www.ebi.ac.uk/metagenomics/) | [download](https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/download/datas/Full_Combined_data.binary_packaged.pdata.zip) | packaged (binary) |
+| FEAST dataset       | 10,270 samples curated from MGnify database, also used in FEAST study | [MGnify](https://www.ebi.ac.uk/metagenomics/) | [download](https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/download/datas/FEAST_dataset.ascii_packaged.pdata) | packaged (ascii)  |
+| skin samples        | 1,261 skin metagenomic samples                               | [MGnify](https://www.ebi.ac.uk/metagenomics/) | [download](https://www.ebi.ac.uk/metagenomics/api/v1/studies/MGYS00005172/pipelines/4.1/file/SRP113602_taxonomy_abundances_SSU_v4.1.tsv) | abundance matrix  |
+| oral samples        | 70 oral metagenomic samples                                  | [MGnify](https://www.ebi.ac.uk/metagenomics/) | [download?](https://www.ebi.ac.uk/metagenomics/api/v1/studies/MGYS00005569/pipelines/5.0/file/SRP256368_taxonomy_abundances_SSU_v5.0.tsv) | abundance matrix  |
+| groundwater samples | 11 groundwater samples curated from Saudi Arabian            | [MGnify](https://www.ebi.ac.uk/metagenomics/) | [download](https://www.ebi.ac.uk/metagenomics/api/v1/studies/MGYS00001601/pipelines/3.0/file/ERP010611_taxonomy_abundances_v3.0.tsv) | abundance matrix  |
+| 6896 samples        | 611 samples from indoor house surfaces and 6,285 samples     | [MGnify](https://www.ebi.ac.uk/metagenomics/) | [download?]()                                                | Run IDs list      |
 
 ## Note
+* We don't provide our synthesized dataset (with one-million samples) here. But you can easily synthesize the dataset by following these [steps]().
 * Many phylogenetic tree has notation in file, including silva phylogenetic tree. You need to delete notations before running program.
 * Our packaged data format is combined with phylogenetic tree. After you packaged samples from one tree, you can't calculate this data with another tree.
 
 ## Contact
 康凯 Kai Kang 
- 
+
 kang_kai_kk@icloud.com
 
 宁康 Kang Ning
-  
+
 ningkang@hust.edu.cn
