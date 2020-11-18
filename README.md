@@ -78,7 +78,7 @@ or [local backup](https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/d
 | groundwater samples                  | 11 Query samples curated from groundwater in Saudi Arabian   | [MGnify](https://www.ebi.ac.uk/metagenomics/) | [download](https://www.ebi.ac.uk/metagenomics/api/v1/studies/MGYS00001601/pipelines/3.0/file/ERP010611_taxonomy_abundances_v3.0.tsv) | abundance matrix  |
 | dataset for detecting contaminations | 611 Query samples from indoor house surfaces +<br />6,285 Target samples | [MGnify](https://www.ebi.ac.uk/metagenomics/) | [download](https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/download/datas/contamination_study_related_RunIDs.txt) | Run IDs list      |
 
-There related meta data are available from [MGnify](https://www.ebi.ac.uk/metagenomics/) database.
+Their related meta data are available from [MGnify](https://www.ebi.ac.uk/metagenomics/) database.
 
 ## Note
 
