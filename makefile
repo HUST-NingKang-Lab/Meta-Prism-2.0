@@ -1,21 +1,24 @@
 CXXFLAGS= -std=c++11 -O3 -m64 -march=native
-objects = src/loader.o src/newickParser.o src/simCalc.o src/structure.o src/main.o src/booster.o
+objects = build/loader.o build/newickParser.o build/simCalc.o build/structure.o build/main.o build/booster.o
 build: $(objects)
 	mkdir -p bin
 	g++ $(CXXFLAGS) -lpthread -o bin/Meta-Prism_2.0 $(objects)
-src/main.o: src/main.cpp
-	g++ $(CXXFLAGS) -c  -o src/main.o src/main.cpp
-src/simCalc.o: src/simCalc.hpp src/simCalc.cpp
-	g++ $(CXXFLAGS) -c -lpthread -o src/simCalc.o src/simCalc.cpp
-src/loader.o: src/loader.cpp src/loader.hpp
-	g++ $(CXXFLAGS) -c -o src/loader.o src/loader.cpp
-src/newickParser.o:src/newickParser.cpp src/newickParser.h
-	g++ $(CXXFLAGS) -c -o src/newickParser.o src/newickParser.cpp
-src/structure.o:src/structure.h src/structure.cpp
-	g++ $(CXXFLAGS) -c -o src/structure.o src/structure.cpp
-src/booster.o:src/booster.cpp src/booster.hpp
-	g++ $(CXXFLAGS) -c -o src/booster.o src/booster.cpp
+build/main.o: src/main.cpp
+	g++ $(CXXFLAGS) -c  -o build/main.o src/main.cpp
+build/simCalc.o: src/simCalc.hpp src/simCalc.cpp mkbuild
+	g++ $(CXXFLAGS) -c -lpthread -o build/simCalc.o src/simCalc.cpp
+build/loader.o: src/loader.cpp src/loader.hpp mkbuild
+	g++ $(CXXFLAGS) -c -o build/loader.o src/loader.cpp
+build/newickParser.o:src/newickParser.cpp src/newickParser.h mkbuild
+	g++ $(CXXFLAGS) -c -o build/newickParser.o src/newickParser.cpp
+build/structure.o:src/structure.h src/structure.cpp mkbuild
+	g++ $(CXXFLAGS) -c -o build/structure.o src/structure.cpp
+build/booster.o:src/booster.cpp src/booster.hpp mkbuild
+	g++ $(CXXFLAGS) -c -o build/booster.o src/booster.cpp
+mkbuild:
+	mkdir -p build
 .PHONY: clean
 clean:
-	rm src/*.o
+	rm build/*
 	rm bin/* 
+
