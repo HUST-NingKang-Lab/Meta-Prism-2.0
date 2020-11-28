@@ -121,7 +121,7 @@ public:
     }
 };
 
-class matrixModeResult{//
+class matrixModeResult{
 private:
     template <typename T>
     int alloc(int x,T*** sData);

@@ -12,7 +12,8 @@
 #include "newickParser.h"
 #include <stdio.h>
 using namespace std;
-class BinaryIO{
+class BinaryIO{// this class could detect memory storage mode: Big-endian or Little-endian, and change value to Little-edian storage
+            // thus binary packaged data could share across Big-endian and Little-endian
 private:
     bool littleE;
 public:
@@ -26,31 +27,12 @@ public:
         littleE=(1==c.b);
     }
     template <typename T>
-    void v2s(char *buf,T* V){
-        char *data=(char*)V;
-        uint32_t size=sizeof(T);
-        if(littleE){
-            memcpy(buf,data,size);
-        }
-        else{
-        for(int i=0;i<size;i++){
-            buf[i]=data[size-i];
-        }}
-    }
+    inline void v2s(char *buf,T* V);//change value to Little-endian
     template <typename T>
-    void s2v(char *buf,T* V){
-        char *data=(char*)V;
-        uint32_t size=sizeof(T);
-        if(littleE){
-            memcpy(data,buf,size);
-        }
-        else{
-        for(int i=0;i<size;i++){
-            data[i]=buf[size-i];
-        }}
-    }
+    inline void s2v(char *buf,T* V);//change Little-endian to value
 };
-class loader{
+
+class loader{// this class could load sample data set and package
 private:
     vector<sampleData> data;
     CompData compData;
@@ -71,14 +53,16 @@ public:
     loader(parser *p){this->p=p;}
     int loadOTUData(ifstream &ifile);
     const vector<sampleData>& getData(){return data;}
-    int loadCompData(ifstream &ifile);
     sampleData* loadTSVFile(ifstream &ifile,string name="not defined");
+    
     int loadMultiTSV(ifstream &ifile);
-    int outputMirror(ofstream &ofile);
     int loadBMultiTSV(ifstream &ifile);
-    int outputBMirror(ofstream &ofile);
     int loadFromMirror(ifstream &ifile);
+    
+    int outputBMirror(ofstream &ofile);
+    int outputMirror(ofstream &ofile);
     int outTSVTable(ofstream &ofile);
+    
     int size(){return Data.size();}
     void genName(){
         names.clear();

@@ -8,6 +8,30 @@
 
 #include "loader.hpp"
 string Bacteria="Bacteria";
+template <typename T>
+inline void BinaryIO::v2s(char *buf, T *V){
+    char *data=(char*)V;
+    uint32_t size=sizeof(T);
+    if(littleE){
+        memcpy(buf,data,size);
+    }
+    else{
+    for(int i=0;i<size;i++){
+        buf[i]=data[size-i];
+    }}
+}
+template <typename T>
+inline void BinaryIO::s2v(char *buf, T *V){
+    char *data=(char*)V;
+    uint32_t size=sizeof(T);
+    if(littleE){
+        memcpy(data,buf,size);
+    }
+    else{
+    for(int i=0;i<size;i++){
+        data[i]=buf[size-i];
+    }}
+}
 void changeRelative(vector<sampleData*> &A){
     for(auto iter=A.begin();iter!=A.end();iter++){
         sampleData &data=*(*iter);
@@ -134,22 +158,6 @@ int loader::loadOTUData(ifstream &ifile){
         Data[(*iter)->name]=(*iter);
     }
     cout<<endl;
-    return 0;
-}
-int loader::loadCompData(ifstream &ifile){
-    int leafSize=p->getLeafSize();
-    compData.order_1=new int[leafSize];
-    compData.order_2=new int[leafSize];
-    compData.order_N=new int[leafSize];
-    compData.dist_1=new float[leafSize];
-    compData.dist_2=new float[leafSize];
-    string readBuf,buffer;stringstream buf;
-    int i=0;
-    while(getline(ifile, readBuf)){
-        buf.clear();buf.str(readBuf);
-        buf>>compData.order_1[i]>>compData.dist_1[i]>>compData.order_2[i]>>compData.dist_2[i]>>compData.order_N[i];
-        i++;
-    }
     return 0;
 }
 sampleData* loader::loadTSVFile(ifstream &ifile,string name){

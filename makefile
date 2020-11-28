@@ -1,6 +1,7 @@
 CXXFLAGS= -std=c++11 -O3 -m64 -march=native
 objects = src/loader.o src/newickParser.o src/simCalc.o src/structure.o src/main.o src/booster.o
 build: $(objects)
+	mkdir -p bin
 	g++ $(CXXFLAGS) -lpthread -o bin/Meta-Prism_2.0 $(objects)
 src/main.o: src/main.cpp
 	g++ $(CXXFLAGS) -c  -o src/main.o src/main.cpp

@@ -5,6 +5,7 @@
 //  Created by 康凯 on 2020/2/28.
 //  Copyright © 2020 康凯. All rights reserved.
 //
+//Generate reduced tree, reduced calculation order and convert method
 
 #ifndef booster_hpp
 #define booster_hpp
@@ -42,7 +43,6 @@ public:
     }
     int setData(sampleData *A);
     ~booster(){
-        
         delete table;
         delete matrix[0];delete source[0];
         delete matrix;delete source;

@@ -5,7 +5,8 @@
 //  Created by 康凯 on 2019/12/23.
 //  Copyright © 2019 康凯. All rights reserved.
 //
-
+/*
+ */
 #ifndef sparseSimCalc_hpp
 #define sparseSimCalc_hpp
 #ifdef __AVX__
@@ -19,7 +20,7 @@
 #include <stdio.h>
 #include "booster.hpp"
 using namespace std;
-struct LineCompareArg{
+struct LineCompareArg{//Use this structure send arguments to calculation threads
     int id=0;
     int core=1;
     int number=0;
@@ -27,7 +28,7 @@ struct LineCompareArg{
     matrixModeResult * result=NULL;
     loader *A=NULL,*B=NULL;
 };
-float * multiSparseCompare(float ** a,float**b,const CompData* compData,int sampleSize,int orderSize);
+float * multiSparseCompare(float ** a,float**b,const CompData* compData,int sampleSize,int orderSize);// Boost scheme calculation
 void *lineCompare(void * args);
 matrixModeResult* matrixBoostCompare( loader & A,int core,bool lowMem);
 searchResult* searchBoostCompare(class loader &A,class loader &B,int core,int topN);
