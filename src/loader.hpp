@@ -70,6 +70,7 @@ public:
             names.push_back(iter->second->name);
         return;
     }
+    int merge(loader &data);
     int printToTable(ofstream &ofile);
     //int out
 };

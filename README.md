@@ -36,6 +36,16 @@ Ascii format packaged data is easy to read and edit, while binary format data is
 `--package(-p) [ascii|binary] [path]`
 
 Note that the packaged data is bound to the evolution tree and cannot be used with another evolution tree.
+
+### Merge data:
+Meta prism 2.0 can load mutiple database and merge these together by command:
+
+`--merge + [[single|list|OTU|ascii|binary] + [sample path],...]`
+
+For example:
+
+`./bin/Meta-Prism2.0 --tree [TreePath] -l OTU [OTUPath] -merge ascii [Path1] binnary [Path2] -p [PackagePath]`
+
 ### Calculate similarity matrix:
 Meta prism 2.0 can load the data of microbiome samples and calculate the similarity matrix between samples. 
 ```
@@ -62,7 +72,24 @@ For example:
 `./bin/Meta-Prism_2.0 --tree [TreePath] -l ascii [PdataPath] -s single [FilePath] 3 -o [ResultPath]`
 
 Multiple samples can be read from the packaged file with ascii type as the database, searched with one sample in FilePath, returned the three best matched samples, and output to ResultPath. 
+
+
+## Note
+
+* We don't provide our synthesized dataset (with one-million samples) here. But you can easily synthesize the dataset by following these [steps]().
+* Many phylogenetic tree has notation in file, including silva phylogenetic tree. You need to delete notations before running program.
+* Our packaged data format is combined with phylogenetic tree. After you packaged samples from one tree, you can't calculate this data with another tree.
+
+## Contact
+
+   Name   |      Email      |      Organization
+:--------:|-----------------|--------------------------------------------------------------------------------------------------------------------------------
+康凯 Kai Kang |kang_kai_kk@icloud.com|Research Assistant, School of Life Science and Technology, Huazhong University of Science & Technology
+冲辉 Hui Chong|huichong.me@gmail.com|Research Assistant, School of Life Science and Technology, Huazhong University of Science & Technology
+宁康 Kang Ning|ningkang@hust.edu.cn|Professor, School of Life Science and Technology, Huazhong University of Science & Technology
+
 ## Supplement
+### Datas
 We provide Silva tree data, SSU_ TSV data, ascii packaged data for example.
 
 [Silva phylogenetic tree](https://www.arb-silva.de/fileadmin/silva_databases/living_tree/LTP_release_132/LTPs132_SSU_tree.newick) (need to delete description head first)
@@ -90,16 +117,91 @@ or [local backup](https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/d
 
 Their related meta data are available from [MGnify](https://www.ebi.ac.uk/metagenomics/) database.
 
-## Note
+### Formats
+1. Format of phylogeny tree:
 
-* We don't provide our synthesized dataset (with one-million samples) here. But you can easily synthesize the dataset by following these [steps]().
-* Many phylogenetic tree has notation in file, including silva phylogenetic tree. You need to delete notations before running program.
-* Our packaged data format is combined with phylogenetic tree. After you packaged samples from one tree, you can't calculate this data with another tree.
+`(Left_Node: Phylogeny_DIstance, Right_Node: Phylogeny_Distance)` Left or Right Node are both recursable, for example:
+```
+((NodeA:0.2,(NodeB:0.1,NodeC:0.2):0.2):0.3,(((NodeD:0.15,NodeE:0.23):0.66,NodeF:0.4)NodeH:0.7,NodeG:0.5):0.2)
+```
 
-## Contact
+2. Format of tsv data:
 
-   Name   |      Email      |      Organization
-:--------:|-----------------|--------------------------------------------------------------------------------------------------------------------------------
-康凯 Kai Kang |kang_kai_kk@icloud.com|Research Assistant, School of Life Science and Technology, Huazhong University of Science & Technology
-冲辉 Hui Chong|huichong.me@gmail.com|Research Assistant, School of Life Science and Technology, Huazhong University of Science & Technology
-宁康 Kang Ning|ningkang@hust.edu.cn|Professor, School of Life Science and Technology, Huazhong University of Science & Technology
+Each line contains Relative abundance, taxonomy. For example:
+
+```
+# Constructed from biom file
+# OTU ID    ERR1760122    taxonomy
+150410    9.0    Unclassified
+84498    1.0    sk__Archaea
+82688    2.0    sk__Archaea;k__;p__Euryarchaeota;c__Methanobacteria;o__Methanobacteriales;f__Methanobacteriaceae;g__Methanobrevibacter
+120987    5.0    sk__Archaea;k__;p__Euryarchaeota;c__Methanomicrobia;o__Methanosarcinales;f__Methanosarcinaceae
+46074    33.0    sk__Archaea;k__;p__Euryarchaeota;c__Methanomicrobia;o__Methanosarcinales;f__Methanosarcinaceae;g__Methanimicrococcus
+```
+
+3. Format of OTU data:
+
+Matrix of relative abundance for different samples and taxonomy, for example:
+```
+#Taxonomy     Sample1     Sample2     Sample3
+sk__Bacteria;k__;p__Actinobacteria;c__Actinobacteria        0.3     0.1     0.5
+sk__Bacteria;k__;p__Actinobacteria;c__Actinobacteria;o__Actinomycetales;f__Actinomycetaceae;g__Actinotignum     0.4     0.9     0
+sk__Bacteria;k__;p__Proteobacteria;c__Gammaproteobacteria;o__Xanthomonadales;f__Xanthomonadaceae        0.3     0       0.5
+```
+
+4. Format of ascii packaged data:
+
+Samples are splited by '{' or '}', in each sample contains relative abundance and taxa_id at phylogeny tree, for example:
+```
+#Generated By Prism2.0,Data number: 2
+{
+MGYS00002173-SRR2086747.tsv
+98:557 4.06554e-05,816 0.0060983,2968 4.06554e-05,3617 0.00422816,4050 4.06554e-05,4158 0.000243932,4229 0.00959467,4494 0.0446802,4610 0.00195146,4616 0.000162621,4621 4.06554e-05,4662 4.06554e-05,4686 0.000121966,4756 0.000284588,5231 4.06554e-05,5478 8.13107e-05,5561 0.000731797,5818 0.00166687,6464 4.06554e-05,8678 0.000121966,9419 4.06554e-05,9422 0.00060983,9563 0.069602,9633 0.000487864,9634 0.00126032,9692 0.133675,9725 0.0473228,9726 0.0133756,9925 0.000569175,9999 0.044355,10095 0.000365898,10515 0.0015449,11693 0.00378095,12211 0.053909,12245 4.06554e-05,12262 0.00138228,12268 4.06554e-05,12274 0.00317112,12276 0.000243932,12312 0.000121966,12424 0.113672,12441 4.06554e-05,12479 0.0197585,12507 0.0566329,12627 4.06554e-05,12645 0.0921657,12862 0.000121966,13867 0.00390291,13939 4.06554e-05,14921 0.0015449,14971 0.000325243,14984 0.000650486,14988 0.000203277,14995 8.13107e-05,15047 4.06554e-05,15932 0.00134163,16149 0.015571,18277 0.00556978,20690 0.000447209,20797 0.00536651,20848 0.000325243,20940 8.13107e-05,20955 8.13107e-05,20976 0.000487864,21023 0.0207749,21609 8.13107e-05,21627 0.00101638,21646 4.06554e-05,21988 0.0373216,22051 0.00101638,22101 0.000121966,22118 0.00113835,22119 0.00439078,22400 0.000121966,22541 0.000243932,22581 0.00898484,22780 0.000121966,24879 0.00162621,24940 0.0045534,25074 4.06554e-05,25144 0.0123592,25537 0.00430947,25593 0.000975729,25597 4.06554e-05,25737 0.00150425,25800 0.000691141,25939 0.00187015,25970 0.00357767,25972 0.000203277,25996 0.000162621,26023 0.00573241,26078 0.000691141,26123 0.0428508,26134 0.000121966,26399 0.00101638,26575 0.0079278,26699 0.00939139,26810 0.0603326,
+}
+{
+MGYS00002173-SRR2086906.tsv
+28:4050 0.0247525,4158 0.618812,4610 0.00990099,9286 0.019802,9422 0.00495049,9563 0.039604,9692 0.019802,9725 0.0148515,9726 0.0148515,9999 0.00990099,12211 0.00495049,12239 0.00495049,12274 0.00495049,12424 0.039604,12507 0.0247525,12645 0.0445545,13867 0.00990099,20976 0.00495049,21023 0.00495049,21627 0.00495049,21988 0.00990099,22119 0.00495049,22541 0.00495049,22581 0.00495049,26023 0.00495049,26123 0.029703,26575 0.00990099,26810 0.00495049,
+}
+```
+5. Format of binnary packaged data:
+
+Binnary packaged data is mainly similar to ascii packaged data. The structure is (little endian):
+
+```
+20 Byte char Source
+4 Byte float Version
+8 Byte unsigned_int Size # Count of samples
+
+# At each sample:
+38 Byte char Sample_Name
+8 Byte unsigned_int SampleSize # Count of sample's abundance
+Repeat of 4 Byte unsigned_int Taxa_ID and 4 Byte float abundance pair
+```
+6. Format of matrix mode result:
+
+Result of matrix mode calculation is ascii packaged. The structure is:
+```
+N # count of samples
+SampleName1 SampleName2 SampleName3 ... SampleNameN # N samples' name
+value11 value12 ... value1N # first line of similarity matrix
+...
+valueN1 valueN2 ... ValueNN # last line of similarityt matrix
+```
+
+7. Format of search mode result:
+
+TopN result of  search mode calculation is ascii packaged. The structure is:
+```
+QuerySample1: 1st_Matched_Target_Sample:Similarity, 2nd_Matched_Target_Sample:Similarity, ... Nth_Matched_Target_Sample:Similarity,
+QuerySample2: 1st_Matched_Target_Sample:Similarity, 2nd_Matched_Target_Sample:Similarity, ... Nth_Matched_Target_Sample:Similarity,
+...
+```
+Full result of search mode calculation is ascii packaged. The structure is:
+```
+X # Count of Query samples
+TargetSampleName1 TargetSampleName2 ... TargetSampleNameN
+QuerySample1 SimilarityValue11 SimilarityValue12 ... SimilarityValue1N
+QuerySample2 SimilarityValue21 SimilarityValue22 ... SimilarityValue2N
+...
+QuerySampleX SimilarityValueX1 SimilarityValueX2 ... SimilarityValueXN
+```

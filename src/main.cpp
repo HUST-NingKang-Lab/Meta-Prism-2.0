@@ -54,6 +54,7 @@ void ArgParser::printHelp(){
     <<"--package(-p) [ascii|binary] [path]: save package of loaded file\n"
     // <<"--convertOTU [path]: save as OTU format\n"
     // <<"--outTree [path]: save package of loaded file\n"
+    <<"--merge + [[single|list|OTU|ascii|binary] + [sample path],...]: Load these samples and merge together"
     <<"--threads(-T)+ [number of threads]:default single thread\n--help(-h) help\n";
 }
 int ArgParser::parse(int argc,const char *argv[]){
@@ -165,7 +166,36 @@ int main(int argc, const char * argv[]) {
         finishTime=clock();
         cout<<"load use"<<(double)(finishTime-startTime)/CLOCKS_PER_SEC<<endl;
     }
-    
+    if((arg_buf=aP.get("--merge"))){
+        auto mergeSize=(*arg_buf).size();
+        if(mergeSize%2!=0){
+            cout<<"\nError, must input pairs of dataset type and dataset path, So skip this command"<<endl;
+        }
+        else{
+            loader * mDatabase;
+            mDatabase=new loader(p);
+            for(int i=0;i<mergeSize;i+=2){
+                pathBuffer=(*arg_buf)[i+1];
+                if(buffer=="list"){
+                    ifile1.open(pathBuffer);
+                    mDatabase->loadMultiTSV(ifile1);
+                }
+                else if (buffer=="OTU"){
+                    ifile1.open(pathBuffer);
+                    mDatabase->loadOTUData(ifile1);
+                }
+                else if (buffer=="ascii"){
+                    ifile1.open(pathBuffer);
+                    mDatabase->loadFromMirror(ifile1);
+                }else if (buffer=="binary"){
+                    ifile1.open(pathBuffer,ios::binary);
+                    mDatabase->loadBMultiTSV(ifile1);
+                }
+                database->merge(*mDatabase);
+            }
+        }
+        
+    }
     if((arg_buf=aP.get("-p","--package"))){// package basic dataset as ascii format or binary format
         pathBuffer=(*arg_buf)[1];
         buffer=(*arg_buf)[0];

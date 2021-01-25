@@ -392,6 +392,13 @@ int loader::loadBMultiTSV(ifstream &ifile){
     delete [] buffer;
     return 0;
 }
+int loader::merge(loader &data){
+    for(auto iter=data.Data.begin();iter!=data.Data.end();iter++){
+        this->Data[iter->first]=iter->second;
+    }
+    this->genName();
+    return 0;
+}
 int loader::outputBMirror(ofstream &ofile){
     Infos info;
     strcpy(info.source,"Meta-Prism 2.0");
@@ -424,3 +431,4 @@ int loader::outputBMirror(ofstream &ofile){
     delete [] buffer;
     return 0;
 }
+
