@@ -24,22 +24,22 @@ We successfully compiled on CentOS 7.6 by gcc 4.8.5 and macOS 10.15 by clang 11.
 `make clean`
 ## Usage
 ### Prepare phylogeny tree:
-Meta prism 2.0 needs the evolutionary tree of Newick format as the basis of calculation. It is recommended to use Silva evolutionary tree, or set the evolutionary tree according to the sequencing results or use requirements. Use  `  -t [path]` or `--tree [path] `   to select the evolutionary tree path.
+Meta prism 2.0 needs the evolutionary tree of `Newick` format as the basis of calculation. It is recommended to use `SILVA` phylogenetic tree, or set the phylogenetic tree according to the sequencing results or use requirements. Use  `  -t [path]` or `--tree [path] `   to select the phylogenetic tree path.
 ### Load data:
-Meta prism 2.0 supports SSU abundance data files in EBI MGNify and other databases as input, and provides special packaged data format with two types: ascii and binary to store abundance more efficiently. Note that packaged data is bound to the specific evolution tree. 
+Meta prism 2.0 supports  taxa abundance data, and provides special packaged data format with two types (ascii and binary) to store the abundance more efficiently. Note that packaged data is bound to the specific phylogenetic tree. 
 
 `--load(-l) [list|mat|ascii|binary] [path]`
 
 ### Package data:
-Meta prism 2.0 can package texa data with by ascii or binary for space efficient storage and fast loading.
-Ascii format packaged data is easy to read and edit, while binary format data is more efficient at space and time.
+Meta prism 2.0 can package the abundance data to ascii or binary format for efficient storage and fast loading.
+Ascii format packaged data is easy to read and edit, while binary format data is more efficient in terms of space and time usage.
 
 `--package(-p) [ascii|binary] [path]`
 
-Note that the packaged data is bound to the evolution tree and cannot be used with another evolution tree.
+Note that the packaged data is bound to the phylogenetic tree and cannot be used with another phylogenetic tree.
 
 ### Merge data:
-Meta prism 2.0 can load mutiple database and merge these together by command:
+Meta prism 2.0 can load multiple database and merge these together by command:
 
 `--merge + [[single|list|mat|ascii|binary] + [sample path],...]`
 
@@ -48,7 +48,7 @@ For example:
 `./bin/Meta-Prism2.0 --tree [TreePath] -l mat [matPath] -merge ascii [Path1] binnary [Path2] -p [PackagePath]`
 
 ### Calculate similarity matrix:
-Meta prism 2.0 can load the data of microbiome samples and calculate the similarity matrix between samples. 
+Meta prism 2.0 can load the data of microbial community samples and calculate the similarity matrix between samples. 
 ```
 --matrix(-m) ## Calculate similarity matrix
 --output(-o) [path] ## Result output path
@@ -59,9 +59,9 @@ For example:
 
 `./bin/Meta-Prism2.0 --tree [TreePath] -l mat [matPath] -m -o [ResultPath]`
 
-This command will open mat file and read all samples, calculate the similarity matrix, and output it at ResultPath.
+This command will open mat file and read all samples, calculate the similarity matrix, and save it to ResultPath.
 ### Database search:
-> Meta prism 2.0 can search one or more microbial samples for another group of microbial samples, and return the top n sample name with the highest similarity and similarity. Relevant args are:  
+> Meta prism 2.0 can search one or more microbial samples for another group of microbial samples, and return the top n sample name with the highest similarity and similarity. Relevant options are:  
 ```
 --search(-s) [single|list|mat|ascii|binary] [search sample path] [select number|f] ## Load and search samples then return top N (default=5, input char 'f' will return full result as matrix) similar samples
 --output(-o) [path] ## Result output path
@@ -77,7 +77,7 @@ Multiple samples can be read from the packaged file with ascii type as the datab
 
 ## Note
 
-* Many phylogenetic tree has notation in file, including silva phylogenetic tree. You may want to delete the notations to use the program.
+* Many phylogenetic tree has notation in file, including the SILVA phylogenetic tree. You may want to delete the notations to use the program.
 * Our packaged data format is combined with the phylogenetic tree. After you packaged samples from one tree, you cannot perform calculation using the data with another phylogenetic tree.
 
 ### Formats
@@ -91,9 +91,9 @@ Both left or right node are recursable. For example
 ((NodeA:0.2,(NodeB:0.1,NodeC:0.2):0.2):0.3,(((NodeD:0.15,NodeE:0.23):0.66,NodeF:0.4)NodeH:0.7,NodeG:0.5):0.2)
 ```
 
-2. Format of tsv data
+2. Format of taxa abundance data (for a microbial community sample)
 
-Each line contains abundance and taxonomy. For example
+Each line contains abundance and taxonomy.
 
 <table><thead><tr><th colspan="3"># Constructed from biom file</th></tr></thead><tbody><tr><td># OTU ID</td><td>ERR1754760</td><td>taxonomy</td></tr><tr><td>207119</td><td>19.0</td><td>sk__Archaea</td></tr><tr><td>118090</td><td>45.0</td><td>sk__Archaea;k__;p__Thaumarchaeota;c__;o__Nitrosopumilales;f__Nitro...</td></tr><tr><td>153156</td><td>38.0</td><td>sk__Archaea;k__;p__Thaumarchaeota;c__;o__Nitrosopumilales;f__Nitro...</td></tr><tr><td>131704</td><td>1.0</td><td>sk__Archaea;k__;p__Thaumarchaeota;c__Nitrososphaeria;o__Nitrososp...</td></tr><tr><td>103181</td><td>5174.0</td><td>sk__Bacteria</td></tr><tr><td>157361</td><td>9.0</td><td>sk__Bacteria;k__;p__;c__;o__;f__;g__;s__agricultural_soil_bacterium_SC-I-11</td></tr></tbody></table>
 
@@ -109,7 +109,7 @@ sk__Bacteria;k__;p__Proteobacteria;c__Gammaproteobacteria;o__Xanthomonadales;f__
 
 4. Format of ascii packaged data
 
-Samples are split by '{' or '}', in each sample contains relative abundance and taxon_id (identical to taxon name) at phylogeny tree. For example
+Samples are split by '{' or '}', in each sample contains relative abundance and taxon id (identical to taxon name) at phylogeny tree. For example
 ```
 #Generated By Prism2.0,Data number: 2
 {
@@ -121,9 +121,9 @@ MGYS00002173-SRR2086906.tsv
 28:4050 0.0247525,4158 0.618812,4610 0.00990099,9286 0.019802,9422 0.00495049,9563 0.039604,9692 0.019802,9725 0.0148515,9726 0.0148515,9999 0.00990099,12211 0.00495049,12239 0.00495049,12274 0.00495049,12424 0.039604,12507 0.0247525,12645 0.0445545,13867 0.00990099,20976 0.00495049,21023 0.00495049,21627 0.00495049,21988 0.00990099,22119 0.00495049,22541 0.00495049,22581 0.00495049,26023 0.00495049,26123 0.029703,26575 0.00990099,26810 0.00495049,
 }
 ```
-5. Format of binnary packaged data
+5. Format of binary packaged data
 
-Binnary packaged data is mainly similar to ascii packaged data. The structure is (little endian)
+Binary packaged data is mainly similar to ascii packaged data. The structure is (little endian mode)
 
 ```
 20 Byte char Source
@@ -166,23 +166,17 @@ QuerySampleX SimilarityValueX1 SimilarityValueX2 ... SimilarityValueXN
 
 ## Supplement
 
-### Datas
+### Data
 
-We provide Silva tree data, SSU_ TSV data, ascii packaged data for example.
+We provide the SILVA phylogenetic tree, an example taxa abundance data, and an example ascii packaged data.
 
-[Silva phylogenetic tree](https://www.arb-silva.de/fileadmin/silva_databases/living_tree/LTP_release_132/LTPs132_SSU_tree.newick) (need to delete description head first)
-  or [local backup](https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/download/datas/LTPs132_SSU_tree.txt)
+| Data                | Example                                                      |
+| :------------------ | :----------------------------------------------------------- |
+| Phylogenetic tree   | [at SILVA (with header)](https://www.arb-silva.de/fileadmin/silva_databases/living_tree/LTP_release_132/LTPs132_SSU_tree.newick)  or [our local backup (without header)](https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/download/datas/LTPs132_SSU_tree.txt). |
+| taxa abundance data | [at MGnify](https://www.ebi.ac.uk/metagenomics/api/v1/analyses/MGYA00001775/file/ERR358543_FASTQ_otu.tsv) or [our local backup](https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/download/v1.0-with-data/MGYS00000337-ERR358543.tsv). |
+| ascii packaged data | [100 samples](https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/download/datas/100samples.ascii_packaged.pdata) or [1000 samples](https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/download/datas/1000samples.ascii_packaged.pdata) |
 
-[SSU_OTUs data](https://www.ebi.ac.uk/metagenomics/api/v1/analyses/MGYA00001775/file/ERR358543_FASTQ_otu.tsv)
-or [local backup](https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/download/v1.0-with-data/MGYS00000337-ERR358543.tsv)
-
-[100 samples ascii packaged data](https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/download/datas/100samples.ascii_packaged.pdata)
-
-[1000 samples ascii packaged data](https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/download/datas/1000samples.ascii_packaged.pdata)
-
-[file list for example](https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/download/datas/file_list_for_example.txt)
-
-- Datasets used  in our study:
+Datasets used  in our study:
 
 | Dataset                              | Description                                                  | Source                                        | Link                                                         | Format            |
 | ------------------------------------ | ------------------------------------------------------------ | --------------------------------------------- | ------------------------------------------------------------ | ----------------- |
@@ -196,6 +190,8 @@ or [local backup](https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/d
 Their related meta data are available from [MGnify](https://www.ebi.ac.uk/metagenomics/) database.
 
 ## Contact
+
+Feel free to contact us if you have any question. Thank you for using Meta-Prism 2.0.
 
    Name   |      Email      |      Organization
 :--------:|-----------------|--------------------------------------------------------------------------------------------------------------------------------
