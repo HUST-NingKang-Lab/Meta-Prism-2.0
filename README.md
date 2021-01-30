@@ -28,7 +28,7 @@ Meta prism 2.0 needs the evolutionary tree of Newick format as the basis of calc
 ### Load data:
 Meta prism 2.0 supports SSU abundance data files in EBI MGNify and other databases as input, and provides special packaged data format with two types: ascii and binary to store abundance more efficiently. Note that packaged data is bound to the specific evolution tree. 
 
-`--load(-l) [list|OTU|ascii|binary] [path]`
+`--load(-l) [list|mat|ascii|binary] [path]`
 
 ### Package data:
 Meta prism 2.0 can package texa data with by ascii or binary for space efficient storage and fast loading.
@@ -41,11 +41,11 @@ Note that the packaged data is bound to the evolution tree and cannot be used wi
 ### Merge data:
 Meta prism 2.0 can load mutiple database and merge these together by command:
 
-`--merge + [[single|list|OTU|ascii|binary] + [sample path],...]`
+`--merge + [[single|list|mat|ascii|binary] + [sample path],...]`
 
 For example:
 
-`./bin/Meta-Prism2.0 --tree [TreePath] -l OTU [OTUPath] -merge ascii [Path1] binnary [Path2] -p [PackagePath]`
+`./bin/Meta-Prism2.0 --tree [TreePath] -l mat [matPath] -merge ascii [Path1] binnary [Path2] -p [PackagePath]`
 
 ### Calculate similarity matrix:
 Meta prism 2.0 can load the data of microbiome samples and calculate the similarity matrix between samples. 
@@ -57,13 +57,13 @@ Meta prism 2.0 can load the data of microbiome samples and calculate the similar
 
 For example:
 
-`./bin/Meta-Prism2.0 --tree [TreePath] -l OTU [OTUPath] -m -o [ResultPath]`
+`./bin/Meta-Prism2.0 --tree [TreePath] -l mat [matPath] -m -o [ResultPath]`
 
-This command will open OTU file and read all samples, calculate the similarity matrix, and output it at ResultPath.
+This command will open mat file and read all samples, calculate the similarity matrix, and output it at ResultPath.
 ### Database search:
 > Meta prism 2.0 can search one or more microbial samples for another group of microbial samples, and return the top n sample name with the highest similarity and similarity. Relevant args are:  
 ```
---search(-s) [single|list|OTU|ascii|binary] [search sample path] [select number|f] ## Load and search samples then return top N (default=5, input char 'f' will return full result as matrix) similar samples
+--search(-s) [single|list|mat|ascii|binary] [search sample path] [select number|f] ## Load and search samples then return top N (default=5, input char 'f' will return full result as matrix) similar samples
 --output(-o) [path] ## Result output path
 --threads(-T) [Number] ## Threads for calculathon
 ```
@@ -97,7 +97,7 @@ Each line contains abundance and taxonomy. For example
 
 <table><thead><tr><th colspan="3"># Constructed from biom file</th></tr></thead><tbody><tr><td># OTU ID</td><td>ERR1754760</td><td>taxonomy</td></tr><tr><td>207119</td><td>19.0</td><td>sk__Archaea</td></tr><tr><td>118090</td><td>45.0</td><td>sk__Archaea;k__;p__Thaumarchaeota;c__;o__Nitrosopumilales;f__Nitro...</td></tr><tr><td>153156</td><td>38.0</td><td>sk__Archaea;k__;p__Thaumarchaeota;c__;o__Nitrosopumilales;f__Nitro...</td></tr><tr><td>131704</td><td>1.0</td><td>sk__Archaea;k__;p__Thaumarchaeota;c__Nitrososphaeria;o__Nitrososp...</td></tr><tr><td>103181</td><td>5174.0</td><td>sk__Bacteria</td></tr><tr><td>157361</td><td>9.0</td><td>sk__Bacteria;k__;p__;c__;o__;f__;g__;s__agricultural_soil_bacterium_SC-I-11</td></tr></tbody></table>
 
-3. Format of abundance data
+3. Format of abundance mat data
 
 Matrix of relative abundance for different samples and taxonomy. For example
 ```

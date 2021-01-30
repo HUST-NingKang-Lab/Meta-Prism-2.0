@@ -45,16 +45,16 @@ int ArgParser::exist(const string &a){
 }
 void ArgParser::printHelp(){
     cout<<"--tree(-t) [newick tree path]: path of silva newick tree\n"
-    <<"--load(-l) + [list|OTU|ascii|binary] + [path]: load datas from different types\n\n"
+    <<"--load(-l) + [list|mat|ascii|binary] + [path]: load datas from different types\n\n"
     
     <<"--matrix(-m) : computing similarity matrix\n"
-    <<"--search(-s) + [single|list|OTU|ascii|binary] +[search sample path] + [select number|f]: Load and search samples then return top N (default=5, input char 'f' will return full result as matrix) similar samples\n\n"
+    <<"--search(-s) + [single|list|mat|ascii|binary] +[search sample path] + [select number|f]: Load and search samples then return top N (default=5, input char 'f' will return full result as matrix) similar samples\n\n"
     
     <<"--output(-o) [path]: path to output calculation result\n"
     <<"--package(-p) [ascii|binary] [path]: save package of loaded file\n"
-    // <<"--convertOTU [path]: save as OTU format\n"
+    // <<"--convertmat [path]: save as mat format\n"
     // <<"--outTree [path]: save package of loaded file\n"
-    <<"--merge + [[single|list|OTU|ascii|binary] + [sample path],...]: Load these samples and merge together"
+    <<"--merge + [[single|list|mat|ascii|binary] + [sample path],...]: Load these samples and merge together"
     <<"--threads(-T)+ [number of threads]:default single thread\n--help(-h) help\n";
 }
 int ArgParser::parse(int argc,const char *argv[]){
@@ -140,9 +140,9 @@ int main(int argc, const char * argv[]) {
             ifile1.open(pathBuffer);
             database->loadMultiTSV(ifile1);
         }
-        else if (buffer=="OTU"){
+        else if (buffer=="mat"){
             ifile1.open(pathBuffer);
-            database->loadOTUData(ifile1);
+            database->loadMatData(ifile1);
         }
         else if (buffer=="ascii"){
             ifile1.open(pathBuffer);
@@ -180,9 +180,9 @@ int main(int argc, const char * argv[]) {
                     ifile1.open(pathBuffer);
                     mDatabase->loadMultiTSV(ifile1);
                 }
-                else if (buffer=="OTU"){
+                else if (buffer=="mat"){
                     ifile1.open(pathBuffer);
-                    mDatabase->loadOTUData(ifile1);
+                    mDatabase->loadMatData(ifile1);
                 }
                 else if (buffer=="ascii"){
                     ifile1.open(pathBuffer);
@@ -253,9 +253,9 @@ int main(int argc, const char * argv[]) {
             ifile2.open(pathBuffer);
             sample->loadTSVFile(ifile2);
         }
-        else if (buffer=="OTU"){
+        else if (buffer=="mat"){
             ifile2.open(pathBuffer);
-            sample->loadOTUData(ifile2);
+            sample->loadMatData(ifile2);
         }
         else if (buffer=="ascii"){
             ifile2.open(pathBuffer);
@@ -310,7 +310,7 @@ int main(int argc, const char * argv[]) {
     }
     
     //following functions are not shown in --help, because we think these are not frequently used
-    if((arg_buf=aP.get("--convertOTU"))){
+    if((arg_buf=aP.get("--convertmat"))){
         pathBuffer=(*arg_buf)[0];
         ofile1.open(pathBuffer);
         cout<<"Converting data to: "<<pathBuffer<<endl;

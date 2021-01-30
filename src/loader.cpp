@@ -114,7 +114,7 @@ int getID(const string &A,const unordered_map<string, int> &lable,int begin=-1){
     }
     return id;
 }
-int loader::loadOTUData(ifstream &ifile){
+int loader::loadMatData(ifstream &ifile){
     string readBuf,buffer;stringstream buf;float value;
     getline(ifile,readBuf);
     replace(readBuf.begin(), readBuf.end(), '\t', ' ');

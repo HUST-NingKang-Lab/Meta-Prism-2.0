@@ -51,7 +51,7 @@ public:
     vector<string> names;
     parser *p;
     loader(parser *p){this->p=p;}
-    int loadOTUData(ifstream &ifile);
+    int loadMatData(ifstream &ifile);
     const vector<sampleData>& getData(){return data;}
     sampleData* loadTSVFile(ifstream &ifile,string name="not defined");
     
