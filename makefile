@@ -1,4 +1,4 @@
-CXXFLAGS= -std=c++11 -O3 -m64 -march=native
+CXXFLAGS= -std=c++11 -O3 -m64 -march=native -pthread
 objects = build/loader.o build/newickParser.o build/simCalc.o build/structure.o build/main.o build/booster.o
 build: $(objects)
 	mkdir -p bin
@@ -6,7 +6,7 @@ build: $(objects)
 build/main.o: src/main.cpp
 	g++ $(CXXFLAGS) -c  -o build/main.o src/main.cpp
 build/simCalc.o: src/simCalc.hpp src/simCalc.cpp mkbuild
-	g++ $(CXXFLAGS) -c -lpthread -o build/simCalc.o src/simCalc.cpp
+	g++ $(CXXFLAGS) -c -o build/simCalc.o src/simCalc.cpp
 build/loader.o: src/loader.cpp src/loader.hpp mkbuild
 	g++ $(CXXFLAGS) -c -o build/loader.o src/loader.cpp
 build/newickParser.o:src/newickParser.cpp src/newickParser.h mkbuild
