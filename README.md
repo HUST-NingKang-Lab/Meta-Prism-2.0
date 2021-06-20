@@ -13,20 +13,40 @@ Meta-Prism 2.0 has been put to test on several datasets, with largest containing
 In summary, Meta-Prism 2.0 has changed the resource-intensive sample search scheme to an effective procedure, which could be conducted by researchers everyday even on a laptop, for insightful sample search and knowledge discovery. Our work is preprinted at [biorxiv](https://www.biorxiv.org/content/10.1101/2020.11.17.387811v1).
 
 ## Requirement
-We successfully compiled on CentOS 7.6 by gcc 4.8.5 and macOS 10.15 by clang 11.0.0
-## Install and Build
-### Use git clone to download the source code:
-`git clone https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0.git`
-### Build the software:
-`make`
+We successfully compiled on CentOS 7.6 by gcc 4.8.5 and macOS 10.15 by clang 11.0.0.
 
-### Uninstall the software:
-`make clean`
-## Usage
+## Installation
+```bash
+# to download the source code in your local computer
+git clone https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0.git
+
+# to install, run
+make
+
+# to uninstall, run
+make clean
+```
+still in development
+
+## QuickStart
+Here are three commands to start using Meta-Prism 2.0. We provided example datasets to help you startup, but please note that this tutorial needs you have [wget](https://www.gnu.org/software/wget/) and the [Meta-Prism 2.0](https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0#Installation) softwares installed first.
+
+```bash
+# download example datasets
+wget xxxxxx
+
+# search a dataset against another in search mode
+xxxx
+
+# N-against-N comparison in matrix mode
+xxx
+```
+still in development
+## Advanced Usage
 ### Prepare phylogeny tree:
 Meta prism 2.0 needs the evolutionary tree of `Newick` format as the basis of calculation. It is recommended to use `SILVA` phylogenetic tree, or set the phylogenetic tree according to the sequencing results or use requirements. Use  `  -t [path]` or `--tree [path] `   to select the phylogenetic tree path.
 ### Load data:
-Meta prism 2.0 supports  taxa abundance data, and provides special packaged data format with two types (ascii and binary) to store the abundance more efficiently. Note that packaged data is bound to the specific phylogenetic tree. 
+Meta prism 2.0 supports taxa abundance data, and provides special packaged data format with two types (ascii and binary) to store the abundance more efficiently. Note that packaged data is bound to the specific phylogenetic tree.
 
 `--load(-l) [list|mat|ascii|binary] [path]`
 
@@ -48,7 +68,7 @@ For example:
 `./bin/Meta-Prism2.0 --tree [TreePath] -l mat [matPath] -merge ascii [Path1] binnary [Path2] -p [PackagePath]`
 
 ### Calculate similarity matrix:
-Meta prism 2.0 can load the data of microbial community samples and calculate the similarity matrix between samples. 
+Meta prism 2.0 can load the data of microbial community samples and calculate the similarity matrix between samples.
 ```
 --matrix(-m) ## Calculate similarity matrix
 --output(-o) [path] ## Result output path
@@ -72,7 +92,7 @@ For example:
 
 `./bin/Meta-Prism_2.0 --tree [TreePath] -l ascii [PdataPath] -s single [FilePath] 3 -o [ResultPath]`
 
-Multiple samples can be read from the packaged file with ascii type as the database, searched with one sample in FilePath, returned the three best matched samples, and output to ResultPath. 
+Multiple samples can be read from the packaged file with ascii type as the database, searched with one sample in FilePath, returned the three best matched samples, and output to ResultPath.
 
 
 ## Note
