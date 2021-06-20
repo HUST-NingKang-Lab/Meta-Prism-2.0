@@ -17,29 +17,37 @@ We successfully compiled on CentOS 7.6 by gcc 4.8.5 and macOS 10.15 by clang 11.
 
 ## Installation
 ```bash
-# to download the source code in your local computer
+# to clone a local repository/download the source code, run
 git clone https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0.git
 
-# to install, run
+# to install, enter repository folder and run
 make
 
 # to uninstall, run
 make clean
 ```
-still in development
 
 ## QuickStart
 Here are three commands to start using Meta-Prism 2.0. We provided example datasets to help you startup, but please note that this tutorial needs you have [wget](https://www.gnu.org/software/wget/) and the [Meta-Prism 2.0](https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0#Installation) softwares installed first.
 
 ```bash
 # download example datasets
-wget xxxxxx
+wget -c https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/download/datas/Skin_samples.ascii_packaged.pdata
+wget -c https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/download/datas/Oral_samples.ascii_packaged.pdata
+
+# download phylogenetic tree
+wget -c https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/download/datas/LTPs132_SSU_tree.txt
 
 # search a dataset against another in search mode
-xxxx
+./bin/Meta-Prism2.0 --tree LTPs132_SSU_tree.txt \
+  -l ascii Skin_samples.ascii_packaged.pdata \
+  -s ascii Oral_samples.ascii_packaged.pdata 5 \
+  -o Skin_against_Oral.txt
 
 # N-against-N comparison in matrix mode
-xxx
+./bin/Meta-Prism2.0 -m --tree LTPs132_SSU_tree.txt \
+-l ascii Oral_samples.ascii_packaged.pdata \
+-o Oral_SimMatrix.txt
 ```
 still in development
 ## Advanced Usage
