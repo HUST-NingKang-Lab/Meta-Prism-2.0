@@ -16,40 +16,46 @@ In summary, Meta-Prism 2.0 has changed the resource-intensive sample search sche
 We successfully compiled on CentOS 7.6 by gcc 4.8.5 and macOS 10.15 by clang 11.0.0.
 
 ## Installation
+
+- to clone a local repository, run
 ```bash
-# to clone a local repository/download the source code, run
 git clone https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0.git
-
-# to install, enter repository folder and run
+```
+- to install, enter repository folder and run
+```bash
 make
+```
 
-# to uninstall, run
+- to uninstall, run
+```bash
 make clean
 ```
 
 ## QuickStart
 Here are three commands to start using Meta-Prism 2.0. We provided example datasets to help you startup, but please note that this tutorial needs you have [wget](https://www.gnu.org/software/wget/) and the [Meta-Prism 2.0](https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0#Installation) softwares installed first.
 
+- download example datasets
 ```bash
-# download example datasets
 wget -c https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/download/datas/Skin_samples.ascii_packaged.pdata
 wget -c https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/download/datas/Oral_samples.ascii_packaged.pdata
-
-# download phylogenetic tree
-wget -c https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/download/datas/LTPs132_SSU_tree.txt
-
-# search a dataset against another in search mode
-./bin/Meta-Prism2.0 --tree LTPs132_SSU_tree.txt \
-  -l ascii Skin_samples.ascii_packaged.pdata \
-  -s ascii Oral_samples.ascii_packaged.pdata 5 \
-  -o Skin_against_Oral.txt
-
-# N-against-N comparison in matrix mode
-./bin/Meta-Prism2.0 -m --tree LTPs132_SSU_tree.txt \
--l ascii Oral_samples.ascii_packaged.pdata \
--o Oral_SimMatrix.txt
 ```
-still in development
+
+- download phylogenetic tree
+```bash
+wget -c https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/download/datas/LTPs132_SSU_tree.txt
+```
+
+- search a dataset against another in search mode
+```bash
+./bin/Meta-Prism2.0 --tree LTPs132_SSU_tree.txt -l ascii Skin_samples.ascii_packaged.pdata -s ascii Oral_samples.ascii_packaged.pdata 5 -o Skin_against_Oral.txt
+```
+
+- N-against-N comparison in matrix mode
+```bash
+./bin/Meta-Prism2.0 -m --tree LTPs132_SSU_tree.txt -l ascii Oral_samples.ascii_packaged.pdata -o Oral_SimMatrix.txt
+```
+
+
 ## Advanced Usage
 ### Prepare phylogeny tree:
 Meta prism 2.0 needs the evolutionary tree of `Newick` format as the basis of calculation. It is recommended to use `SILVA` phylogenetic tree, or set the phylogenetic tree according to the sequencing results or use requirements. Use  `  -t [path]` or `--tree [path] `   to select the phylogenetic tree path.
