@@ -224,8 +224,14 @@ int loader::loadMultiTSV(ifstream &ifile){
                 j=i;
         }
         buf=nameBuffer.substr(j+1);
-        sDBuf=loadTSVFile(TSVFile,buf);
-        Data[buf]=sDBuf;
+        try {
+            sDBuf=loadTSVFile(TSVFile,buf);
+            Data[buf]=sDBuf;
+        } catch (...) {
+            cout<<buf<<" Error"<<endl;
+        }
+        
+        
         TSVFile.close();
     }
     cout<<endl;
@@ -307,8 +313,44 @@ int loader::loadFromMirror(ifstream &ifile){
     return 0;
 }
 int loader::outTSVTable(ofstream &ofile){
-    map<int,string> usedID;
-    
+    unordered_map<int,int> nameMap;
+    vector<int> names;
+    int id=0;
+    auto pIndex=p->getIndex();
+    for(auto iter=this->Data.begin();iter!=Data.end();iter++){
+        for(auto dataIter=iter->second->data.begin();dataIter!=iter->second->data.end();dataIter++){
+            if (nameMap.find(dataIter->ID)==nameMap.end()) {
+                nameMap[dataIter->ID]=id++;
+                names.push_back(dataIter->ID);
+            }
+        }
+    }
+    ofile<<"#taxa";
+    float **matrix;
+    auto label=p->getLabel();
+    auto index=p->getIndex();
+    matrix=new float*[Data.size()];
+    matrix[0]=new float[Data.size()*nameMap.size()]();
+    for(int i=1;i<Data.size();i++)
+        matrix[i]=matrix[0]+i*nameMap.size();
+    int i=0;
+    for(auto iter=this->Data.begin();iter!=Data.end();iter++){
+        for(auto dataIter=iter->second->data.begin();dataIter!=iter->second->data.end();dataIter++){
+            matrix[i][nameMap[dataIter->ID]]=dataIter->data;
+        }
+        ofile<<'\t'<<iter->second->name;
+        i++;
+    }
+    for(i=0;i<names.size();i++){
+        //int id=names[i];
+        //if(pIndex[id]->lChild!=NULL)
+        //  continue;
+        ofile<<'\n'<<index[names[i]]->name;
+        for(int j=0;j<Data.size();j++)
+            ofile<<'\t'<<matrix[j][i];
+    }
+    delete []matrix[0];
+    delete []matrix;
     return 0;
 }
 int loader::printToTable(ofstream &ofile){

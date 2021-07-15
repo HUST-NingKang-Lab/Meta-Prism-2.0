@@ -326,6 +326,13 @@ int main(int argc, const char * argv[]) {
         database->printToTable(ofile1);
         ofile1.close();
     }
+    if((arg_buf=aP.get("--convertOTU"))){
+        pathBuffer=(*arg_buf)[0];
+        ofile1.open(pathBuffer);
+        cout<<"Converting data to: "<<pathBuffer<<endl;
+        database->outTSVTable(ofile1);
+        ofile1.close();
+    }
     if((arg_buf=aP.get("--printTree"))){
         pathBuffer=(*arg_buf)[0];
         ofile1.open(pathBuffer);

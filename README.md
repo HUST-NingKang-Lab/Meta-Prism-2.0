@@ -13,7 +13,7 @@ Meta-Prism 2.0 has been put to test on several datasets, with largest containing
 In summary, Meta-Prism 2.0 has changed the resource-intensive sample search scheme to an effective procedure, which could be conducted by researchers everyday even on a laptop, for insightful sample search and knowledge discovery. Our work is preprinted at [biorxiv](https://www.biorxiv.org/content/10.1101/2020.11.17.387811v1).
 
 ## Requirement
-We successfully compiled on CentOS 7.6 by gcc 4.8.5 and macOS 10.15 by clang 11.0.0.
+C++ compilers that support C++11.
 
 ## Installation
 
@@ -69,7 +69,7 @@ Datasets used  in our study:
 
 | Dataset                              | Description                                                  | Source                                        | Link                                                         | Format            |
 | ------------------------------------ | ------------------------------------------------------------ | --------------------------------------------- | ------------------------------------------------------------ | ----------------- |
-| Combined dataset                     | 126,727 samples curated from MGnify database                 | [MGnify](https://www.ebi.ac.uk/metagenomics/) | [download](https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/download/datas/Full_Combined_data.binary_packaged.pdata.zip) | packaged (binary) |
+| Combined dataset                     | 126,727 samples curated from MGnify database                 | [MGnify](https://www.ebi.ac.uk/metagenomics/) | [download](https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/download/datas/Full_Combined_dataset.binary_packaged.pdata.zip) | packaged (binary) |
 | FEAST dataset                        | 10,270 samples curated from MGnify database, also used in FEAST study | [MGnify](https://www.ebi.ac.uk/metagenomics/) | [download](https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/download/datas/FEAST_dataset.ascii_packaged.pdata) | packaged (ascii)  |
 | skin samples                         | 1,261 skin metagenomic samples                               | [MGnify](https://www.ebi.ac.uk/metagenomics/) | [download](https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/download/datas/Skin_samples.ascii_packaged.pdata) | packaged (ascii)  |
 | oral samples                         | 70 oral metagenomic samples                                  | [MGnify](https://www.ebi.ac.uk/metagenomics/) | [download](https://github.com/HUST-NingKang-Lab/Meta-Prism-2.0/releases/download/datas/Oral_samples.ascii_packaged.pdata) | packaged (ascii)  |
