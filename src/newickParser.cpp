@@ -18,7 +18,6 @@ parser::parser(string newickTree, int mod) {
     nameTravel(tree, id);
     genTable(tree,depth);
     this->depth++;
-    
     return;
 }
 void parser::parseOne(char *newick, int &index, int end, TreeNode &node,int mod) {

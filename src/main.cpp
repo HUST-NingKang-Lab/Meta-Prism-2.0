@@ -119,8 +119,17 @@ int main(int argc, const char * argv[]) {
         ifile1.open((*arg_buf)[0]);
         stringstream buf;
         string as,line;
+        bool accept=false;
         while(getline(ifile1, line)){
             buf<<line;
+            if (accept)
+                continue;
+            if ((buf.str()[0]) != '('){
+                buf.ios_base::clear();
+                buf.str("");
+            }
+            else
+                accept=true;
         }
         ifile1.close();
         as=buf.str();
