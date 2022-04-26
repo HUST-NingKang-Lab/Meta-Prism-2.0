@@ -12,8 +12,12 @@
 #include "newickParser.h"
 #include <stdio.h>
 using namespace std;
-class BinaryIO{// this class could detect memory storage mode: Big-endian or Little-endian, and change value to Little-edian storage
-            // thus binary packaged data could share across Big-endian and Little-endian
+/*!
+@brief read and write binnary file
+@note This class could detect memory storage mode: Big-endian or Little-endian, and change value to Little-edian storage.
+Thus binary packaged data could share across Big-endian and Little-endian
+*/
+class BinaryIO{
 private:
     bool littleE;
 public:
@@ -31,10 +35,12 @@ public:
     template <typename T>
     inline void s2v(char *buf,T* V);//change Little-endian to value
 };
-
-class loader{// this class could load sample data set and package
+/*!
+@brief This class can read many types of sample datasets and convert them to other formats for output
+*/
+class DataProcessor{
 private:
-    vector<sampleData> data;
+    vector<SampleData> data;
     CompData compData;
     BinaryIO io;
 public:
@@ -47,30 +53,30 @@ public:
         char Name[38];
         uint64_t sampleSize;
     };
-    map<string, sampleData*> Data;
+    map<string, SampleData*> Data;
     vector<string> names;
-    parser *p;
-    loader(parser *p){this->p=p;}
-    int loadMatData(ifstream &ifile);
-    const vector<sampleData>& getData(){return data;}
-    sampleData* loadTSVFile(ifstream &ifile,string name="not defined");
+    NewickParser *p;
+    DataProcessor(NewickParser *p){this->p=p;}
+    int readMatData(ifstream &ifile);
+    const vector<SampleData>& getData(){return data;}
+    SampleData* readSingleTSV(ifstream &ifile,string name="not defined");
     
-    int loadMultiTSV(ifstream &ifile);
-    int loadBMultiTSV(ifstream &ifile);
-    int loadFromMirror(ifstream &ifile);
+    int readMultiTSV(ifstream &ifile);
+    int readBinaryPackage(ifstream &ifile);
+    int readPackage(ifstream &ifile);
     
-    int outputBMirror(ofstream &ofile);
-    int outputMirror(ofstream &ofile);
-    int outTSVTable(ofstream &ofile);
+    int writeBinaryPackage(ofstream &ofile);
+    int writePackage(ofstream &ofile);
+    int writeTSV(ofstream &ofile);
     
-    int size(){return Data.size();}
+    unsigned int size(){return Data.size();}
     void genName(){
         names.clear();
         for(auto iter=Data.begin();iter!=Data.end();iter++)
             names.push_back(iter->second->name);
         return;
     }
-    int merge(loader &data);
+    int merge(DataProcessor &data);
     int printToTable(ofstream &ofile);
     //int out
 };

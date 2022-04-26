@@ -6,8 +6,8 @@
 //  Copyright © 2020 康凯. All rights reserved.
 //
 
-#include "booster.hpp"
-int booster::treeWalk(const TreeNode *a, int id, float coefficient){
+#include "BoostCalculator.hpp"
+int BoostCalculator::treeWalk(const TreeNode *a, int id, float coefficient){
     int thisId=a->id;
     bool sim=false;
     //const Table* compareTable=p->getTable();
@@ -28,7 +28,7 @@ int booster::treeWalk(const TreeNode *a, int id, float coefficient){
     }
     return 0;
 }
-int booster::setData(sampleData *A){
+int BoostCalculator::setData(SampleData *A){
     if(p==nullptr){
         return -1;
     }
@@ -53,10 +53,12 @@ int booster::setData(sampleData *A){
     genCompareData();
     return 0;
 }
-void booster::genCompareData(){
+
+void BoostCalculator::genCompareData(){
     //compareData.init(elementNumber);
     int alloc=1;
     genWalk(p->getTree(), alloc);
+
     for(int i=0;i<p->getTreeSize();i++){
         if(table[i].select==false)
             table[i].targetID=table[table[i].targetID].targetID;
@@ -71,12 +73,13 @@ void booster::genCompareData(){
         compareData.order_N[i]=writeBuff[i].order_N;
         //cout<<writeBuff[i].order_1<<' '<<writeBuff[i].order_2<<' '<<writeBuff[i].order_N<<'\n';
     }
+    
     orderSize=(int)writeBuff.size();
     
     return;
 }
-int booster::genWalk(const TreeNode *a, int &alloc){
-    CompElement buf;int id;
+int BoostCalculator::genWalk(const TreeNode *a, int &alloc){
+    CompNode buf;int id;
     if(a->lChild!=nullptr){
         if(table[a->lChild->id].select)
             buf.order_1=genWalk(a->lChild, alloc);
@@ -97,7 +100,7 @@ int booster::genWalk(const TreeNode *a, int &alloc){
     table[a->id].targetID=id;
     return id;
 }
-int booster::convert(loader &A,int begin,int end){
+int BoostCalculator::convert(DataProcessor &A,int begin,int end){
     if(begin <0)
         begin=0;
     if (end<0)
@@ -114,6 +117,7 @@ int booster::convert(loader &A,int begin,int end){
     auto iter=A.Data.begin();
     for(j=0;j<begin;j++)
         iter++;
+    
     for(;j<end;j++,iter++,i++){
         auto &data=iter->second->data;
         for(auto dataIter=data.begin();dataIter!=data.end();dataIter++){
@@ -132,7 +136,7 @@ int booster::convert(loader &A,int begin,int end){
     }
     return 0;
 }
-float* booster::calc()
+float* BoostCalculator::calc()
 {
     return multiSparseCompare(source, matrix, &compareData, sampleSize, orderSize);
 }

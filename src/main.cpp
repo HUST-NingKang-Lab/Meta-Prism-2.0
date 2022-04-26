@@ -8,12 +8,15 @@
 #include <fstream>
 #include<sstream>
 #include "newickParser.h"
-#include "loader.hpp"
+#include "DataProcessor.hpp"
 #include "simCalc.hpp"
 #include <time.h>
 using namespace std;
 
-class ArgParser{// parsing the command line arguments
+/*!
+@brief  Parser for the command line arguments
+*/
+class ArgParser{
 public:
     void printHelp();
     unordered_map<string, vector<string>> args;
@@ -54,7 +57,7 @@ void ArgParser::printHelp(){
     <<"--package(-p) [ascii|binary] [path]: save package of loaded file\n"
     // <<"--convertmat [path]: save as mat format\n"
     // <<"--outTree [path]: save package of loaded file\n"
-    <<"--merge + [[single|list|mat|ascii|binary] + [sample path],...]: Load these samples and merge together"
+    <<"--merge + [[single|list|mat|ascii|binary] + [sample path],...]: Load these samples and merge together\n"
     <<"--threads(-T)+ [number of threads]:default single thread\n--help(-h) help\n";
 }
 int ArgParser::parse(int argc,const char *argv[]){
@@ -95,7 +98,7 @@ int main(int argc, const char * argv[]) {
     bool testFlag=false,lowMemory=true;
     string pathBuffer,buffer;
     //string pathTree,pathLoad,pathSample,pathOut,pathSave,pathConvert,pathOutTree,pathOutOrder;
-    parser *p = nullptr;loader *database,*sample;
+    NewickParser *p = nullptr;DataProcessor *database,*sample;
     cout << "Welcome to using meta-prism 2.0";
 #ifdef __MP2_Normal__
     cout<<" normal model\n";
@@ -117,6 +120,8 @@ int main(int argc, const char * argv[]) {
     }
     if((arg_buf=aP.get("-t","--tree"))){
         ifile1.open((*arg_buf)[0]);
+        if (!ifile1.good()){
+            cout<<"tree doesn't exist\n";return 0;}
         stringstream buf;
         string as,line;
         bool accept=false;
@@ -125,7 +130,7 @@ int main(int argc, const char * argv[]) {
             if (accept)
                 continue;
             if ((buf.str()[0]) != '('){
-                buf.ios_base::clear();
+                buf.clear();
                 buf.str("");
             }
             else
@@ -133,7 +138,7 @@ int main(int argc, const char * argv[]) {
         }
         ifile1.close();
         as=buf.str();
-        p=new parser(as);
+        p=new NewickParser(as);
     }
     else{
         cout<<"Error, not defined newick tree path\n";
@@ -141,24 +146,29 @@ int main(int argc, const char * argv[]) {
     }
     
     if((arg_buf=aP.get("-l","--load"))){// loading basic sample set
-        database=new loader(p);
+        database=new DataProcessor(p);
         pathBuffer=(*arg_buf)[1];
         cout<<"loading from "<<pathBuffer<<endl;
         buffer=(*arg_buf)[0];
         if(buffer=="list"){
             ifile1.open(pathBuffer);
-            database->loadMultiTSV(ifile1);
+            if (!ifile1.good()){
+                cout<<"dataset file doesn't exist\n";return 0;}
+            database->readMultiTSV(ifile1);
         }
         else if (buffer=="mat"){
             ifile1.open(pathBuffer);
-            database->loadMatData(ifile1);
+            if (!ifile1.good()){cout<<"dataset file doesn't exist\n";return 0;}
+            database->readMatData(ifile1);
         }
         else if (buffer=="ascii"){
             ifile1.open(pathBuffer);
-            database->loadFromMirror(ifile1);
+            if (!ifile1.good()){cout<<"dataset file doesn't exist\n";return 0;}
+            database->readPackage(ifile1);
         }else if (buffer=="binary"){
             ifile1.open(pathBuffer,ios::binary);
-            database->loadBMultiTSV(ifile1);
+            if (!ifile1.good()){cout<<"dataset file doesn't exist\n";return 0;}
+            database->readBinaryPackage(ifile1);
         }
         else{
             cout<<"Error, undefined load type: "<<buffer<<endl;
@@ -181,24 +191,28 @@ int main(int argc, const char * argv[]) {
             cout<<"\nError, must input pairs of dataset type and dataset path, So skip this command"<<endl;
         }
         else{
-            loader * mDatabase;
-            mDatabase=new loader(p);
+            DataProcessor * mDatabase;
+            mDatabase=new DataProcessor(p);
             for(int i=0;i<mergeSize;i+=2){
                 pathBuffer=(*arg_buf)[i+1];
                 if(buffer=="list"){
                     ifile1.open(pathBuffer);
-                    mDatabase->loadMultiTSV(ifile1);
+                    if (!ifile1.good()){cout<<"merge file doesn't exist\n";return 0;}
+                    mDatabase->readMultiTSV(ifile1);
                 }
                 else if (buffer=="mat"){
                     ifile1.open(pathBuffer);
-                    mDatabase->loadMatData(ifile1);
+                    if (!ifile1.good()){cout<<"merge file doesn't exist\n";return 0;}
+                    mDatabase->readMatData(ifile1);
                 }
                 else if (buffer=="ascii"){
                     ifile1.open(pathBuffer);
-                    mDatabase->loadFromMirror(ifile1);
+                    if (!ifile1.good()){cout<<"merge file doesn't exist\n";return 0;}
+                    mDatabase->readPackage(ifile1);
                 }else if (buffer=="binary"){
                     ifile1.open(pathBuffer,ios::binary);
-                    mDatabase->loadBMultiTSV(ifile1);
+                    if (!ifile1.good()){cout<<"merge file doesn't exist\n";return 0;}
+                    mDatabase->readBinaryPackage(ifile1);
                 }
                 database->merge(*mDatabase);
             }
@@ -211,10 +225,10 @@ int main(int argc, const char * argv[]) {
         cout<<"\npackaging data to "<<pathBuffer<<" as "<<buffer<<endl;
         if(buffer=="ascii"){
             ofile1.open(pathBuffer);
-            database->outputMirror(ofile1);
+            database->writePackage(ofile1);
         }else if(buffer=="binary"){
             ofile1.open(pathBuffer,ios::binary);
-            database->outputBMirror(ofile1);
+            database->writeBinaryPackage(ofile1);
         }
         else {
             cout<<"\nError, undefined package type:"<<buffer<<endl;
@@ -254,24 +268,29 @@ int main(int argc, const char * argv[]) {
         pathBuffer=(*arg_buf)[1];
         buffer=(*arg_buf)[0];
         
-        sample=new loader(p);
+        sample=new DataProcessor(p);
         if(buffer=="list"){
             ifile2.open(pathBuffer);
-            sample->loadMultiTSV(ifile2);
+            if (!ifile2.good()){cout<<"search file doesn't exist\n";return 0;}
+            sample->readMultiTSV(ifile2);
         }else if(buffer=="single"){
             ifile2.open(pathBuffer);
-            sample->loadTSVFile(ifile2);
+            if (!ifile2.good()){cout<<"search file doesn't exist\n";return 0;}
+            sample->readSingleTSV(ifile2);
         }
         else if (buffer=="mat"){
             ifile2.open(pathBuffer);
-            sample->loadMatData(ifile2);
+            if (!ifile2.good()){cout<<"search file doesn't exist\n";return 0;}
+            sample->readMatData(ifile2);
         }
         else if (buffer=="ascii"){
             ifile2.open(pathBuffer);
-            sample->loadFromMirror(ifile2);
+            if (!ifile2.good()){cout<<"search file doesn't exist\n";return 0;}
+            sample->readPackage(ifile2);
         }else if (buffer=="binary"){
             ifile2.open(pathBuffer,ios::binary);
-            sample->loadBMultiTSV(ifile2);
+            if (!ifile2.good()){cout<<"search file doesn't exist\n";return 0;}
+            sample->readBinaryPackage(ifile2);
         }else{
             cout<<"Error, undefined load type"<<buffer<<endl;
             return 0;
@@ -330,7 +349,7 @@ int main(int argc, const char * argv[]) {
         pathBuffer=(*arg_buf)[0];
         ofile1.open(pathBuffer);
         cout<<"Converting data to: "<<pathBuffer<<endl;
-        database->outTSVTable(ofile1);
+        database->writeTSV(ofile1);
         ofile1.close();
     }
     if((arg_buf=aP.get("--printTree"))){

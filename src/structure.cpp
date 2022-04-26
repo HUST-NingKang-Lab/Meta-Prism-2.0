@@ -67,9 +67,9 @@ int matrixModeResult::save(ofstream &ofile){
     }
     ofile<<endl;
     if(lowMem)
-        return this->output(ofile, data16);
+        return this->write(ofile, data16);
     else
-        return this->output(ofile, data);
+        return this->write(ofile, data);
 }
 int matrixModeResult::dataAlloc(int x,bool lowFlag){
     lowMem=lowFlag;
@@ -90,7 +90,7 @@ int matrixModeResult::alloc(int x, T ***sData){
     return 0;
 }
 template<typename T>
-int matrixModeResult::output(ofstream &ofile,T** sData){
+int matrixModeResult::write(ofstream &ofile,T** sData){
     int i,j;
     for(i=0;i<x;i++){
         for(j=0;j<i;j++){
@@ -117,8 +117,6 @@ int matrixModeResult::sendResult(int i,float* result){
     pthread_mutex_unlock(&showLock);
     return 0;
 }
-
-
 
 int searchResult::save(ofstream &ofile,vector<string>& DNames,vector<string>&SNames) {
     for (int i = 0; i < SNames.size(); i++) {
@@ -155,7 +153,7 @@ int searchModeFullResult::alloc(int x,int y, T ***sData){
     return 0;
 }
 template<typename T>
-int searchModeFullResult::output(ofstream &ofile,T** sData){
+int searchModeFullResult::write(ofstream &ofile,T** sData){
     int i,j;
     for(i=0;i<x;i++){
         ofile<<nameB[i]<<' ';
@@ -187,7 +185,7 @@ int searchModeFullResult::save(ofstream &ofile){
     }
     ofile<<endl;
     if(lowMem)
-        return this->output(ofile, data16);
+        return this->write(ofile, data16);
     else
-        return this->output(ofile, data);
+        return this->write(ofile, data);
 }

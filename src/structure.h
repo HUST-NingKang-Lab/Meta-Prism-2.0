@@ -26,6 +26,10 @@
 using namespace std;
 #ifndef structure_h
 #define structure_h
+/*!
+@brief  Phylogenic tree storage unit
+@note Each node records the name, ID, depth, left and right child nodes and the distance from the child nodes
+*/
 struct TreeNode{
     string name;
     int id=-1,dep,buf;
@@ -36,13 +40,24 @@ struct TreeNode{
 struct Table{
     int fid,bid,dep;float dist;//treeNode's father id is -1
 };
+/*!
+@brief  Basic unit of sample data
+@note Store each nodes' ID  corresponding to evolutionary tree and relative abundance
+*/
 struct abdElement{
     uint32_t ID;float data;
 };
-struct sampleData{
+/*!
+@brief Storage each sample
+*/
+struct SampleData{
     string name;
     vector<abdElement> data;
 };
+/*!
+@brief Comparison order data
+@note Each element store informations to operate at one node. That is to obtain the abundance from the left child node (order_1), multiply the evolutionary distance of the left child node (dist_1), and then obtain the relative abundance of the right child node (order_2) and multiply the evolutionary distance (dist_2). After the common abundance is obtained, the residual abundance is stored in the current node (order_N).
+*/
 struct CompData{
     int *order_1,*order_2,*order_N;
     float *dist_1,*dist_2;
@@ -58,17 +73,17 @@ struct CompData{
         delete []dist_2;delete []dist_1;delete []order_N;delete []order_2;delete []order_1;
     }
 };
+
 struct index_value{
     unsigned short int index;
     float value;
-    
 };
-
+/*!
+@brief unsigned 16 bit float point
+@note Space efficient method of saving similarity matrix result for reducing memory usage, just take 16 bit. But this need compiler and platform follow IEEE854. Since similarity value is between 0~1, we can save two sign bits from exponent and fraction. First [exp] bit for exponent and last 16-[exp] bit for fraction.
+*/
 class uFP16{
-    //Space efficient method to save similarity matrix result, just take 16 bit. But this need compiler and platform follow IEEE854
-    //Since similarity value is between 0~1, we can save two sign bits from exponent and fraction
-    //first [exp] bit for exponent
-    //last 16-[exp] bit for fraction
+    
     const static uint32_t exp=4,shiftExp=23,frac=16-exp,shiftFrac=shiftExp-frac;// user can change [exp] by their self, but it's not recommanded
     static uint32_t getFrac,Zero;//these will be calculated based on exp
     const static uint32_t getExp=0x0000FF;
@@ -93,7 +108,7 @@ public:
 
 ostream  &operator<<(ostream &out, uFP16 &c1);
 
-class progressBar{// It can show calculation progress for users, but still have some bug
+class ProgressBar{
 public:
     uint64_t value,all;
     float percent;
@@ -126,10 +141,10 @@ private:
     template <typename T>
     int alloc(int x,T*** sData);
     template <typename T>
-    int output(ofstream &ofile,T** sData);
+    int write(ofstream &ofile,T** sData);
     pthread_mutex_t showLock;
 public:
-    progressBar pBar;
+    ProgressBar pBar;
     int x,y;
     bool symmetry=false;
     bool big=false,lowMem=false;
@@ -183,11 +198,11 @@ private:
     template <typename T>
     int alloc(int x,int y,T*** sData);
     template <typename T>
-    int output(ofstream &ofile,T** sData);
+    int write(ofstream &ofile,T** sData);
     pthread_mutex_t showLock;
 public:
     int x,y;
-    progressBar pBar;
+    ProgressBar pBar;
     bool big=false,lowMem=false;
     vector<string> nameA,nameB;
     float **data;

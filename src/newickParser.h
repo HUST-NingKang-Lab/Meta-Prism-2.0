@@ -7,17 +7,18 @@
  
  */
 
-
-
-
-
 #ifndef SRC_NEWICKPARSER_H
 #define SRC_NEWICKPARSER_H
 #include "structure.h"
 using namespace std;
-class parser{// newick format phylogenic tree parser
+/*!
+@brief  newick format phylogenic tree parser
+@note Parse and read the evolutionary tree in newick format, using Silva's LTPs132_SSU_tree by default.
+    
+*/
+class NewickParser{
 protected:
-    TreeNode tree;// evolutional tree
+    TreeNode tree;
     int treeSize,leafNumber,depth;
     unordered_map<string,int> label;// node name to node id
     unordered_map<int, TreeNode*> index;//node id to node ptr
@@ -29,7 +30,7 @@ protected:
     Table *table;//int fid,bid,dep;float dist;
     void printWalk(TreeNode* A,ofstream &ofile);
 public:
-    parser(string newickTree,int mod=0);//parse a newick tree
+    NewickParser(string newickTree,int mod=0);
     const Table* getTable(){return table;}
     int getDepth(){return depth;}//get the max depth of tree
     void genCompData();

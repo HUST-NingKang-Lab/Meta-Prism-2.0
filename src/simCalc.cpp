@@ -11,6 +11,7 @@
 bool i_v_cmp(const index_value& a,const index_value& b){
     return a.value>b.value;
 }
+
 float* multiSparseCompare(float ** a,float**b,const CompData* compData,int sampleSize,int orderSize){
     float *result;
     int order_1=0,order_2=0,order_N=0;float dist_1,dist_2;
@@ -84,7 +85,7 @@ void *lineCompare(void * args){
     for(int i=arg->id;i<size;i+=arg->core){
         if(arg->B==arg->A){//matrix
             
-            auto boost=new booster(arg->A->p);
+            auto boost=new BoostCalculator(arg->A->p);
             boost->setData(iter->second);
             boost->convert(*(arg->A),i+1);
             //boost->genCompareData();
@@ -95,7 +96,7 @@ void *lineCompare(void * args){
         }
         else if(arg->number<0) {
             int x=arg->A->size();
-            auto boost=new booster(arg->A->p);
+            auto boost=new BoostCalculator(arg->A->p);
             searchModeFullResult* result=(searchModeFullResult*)arg->result;
             if(iter->second->data.size()==0){
                 delete boost;
@@ -108,7 +109,7 @@ void *lineCompare(void * args){
         }else{
             int j,topN=arg->number;
             int x=arg->A->size();
-            auto boost=new booster(arg->A->p);
+            auto boost=new BoostCalculator(arg->A->p);
             searchResult* result=(searchResult*)arg->result;
             if(iter->second->data.size()==0){
                 delete boost;
@@ -137,10 +138,10 @@ void *lineCompare(void * args){
     }
     return NULL;
 }
-matrixModeResult* matrixBoostCompare( class loader & A,int core,bool lowMem){
+matrixModeResult* matrixBoostCompare( class DataProcessor & A,int core,bool lowMem){
+    if (A.size() ==0 )
+        throw empty_data;
     matrixModeResult* result;
-    
-    booster * boost;
     int x,i,j;
     if(core <1){
         cout<<"Warning, CPU cores must >=1, we except you select 1\n";
@@ -169,9 +170,10 @@ matrixModeResult* matrixBoostCompare( class loader & A,int core,bool lowMem){
     return result;
 }
 
-searchModeFullResult* fullSearchBoostCompare(class loader &A,class loader &B,int core,bool lowMem) {
+searchModeFullResult* fullSearchBoostCompare(class DataProcessor &A,class DataProcessor &B,int core,bool lowMem) {
+    if (A.size() ==0 or B.size()==0)
+        throw empty_data;
     searchModeFullResult*result;
-    booster * boost;
     int x,y,i,j;
     if(core <1){
         cout<<"Warning, CPU cores must >=1, we except you select 1\n";
@@ -197,9 +199,11 @@ searchModeFullResult* fullSearchBoostCompare(class loader &A,class loader &B,int
     
     return result;
 }
-searchResult* searchBoostCompare(class loader &A,class loader &B,int core,int topN){
+
+searchResult* searchBoostCompare(class DataProcessor &A,class DataProcessor &B,int core,int topN){
+    if (A.size() ==0 or B.size()==0)
+        throw empty_data;
     searchResult*result;
-    booster * boost;
     int x,y,i,j;
     if(core <1){
         cout<<"Warning, CPU cores must >=1, we except you select 1\n";
@@ -209,7 +213,7 @@ searchResult* searchBoostCompare(class loader &A,class loader &B,int core,int to
     result->dataAlloc(B.size(),topN);
     A.genName();
     cout<<"searching "<<y<<" from "<<x<<" samples\n";
-    auto pBar=new progressBar;
+    auto pBar=new ProgressBar;
     pBar->init(x*y);
         pthread_t * tids;
         LineCompareArg * args;

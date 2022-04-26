@@ -5,7 +5,11 @@
 #include "newickParser.h"
 using namespace std;
 string AND="and",OTHER="Other",UC="Unclassified";
-parser::parser(string newickTree, int mod) {
+/*!
+@brief Init a parser object
+@note Initialize the object and take the string information of the newick tree as input
+*/
+NewickParser::NewickParser(string newickTree, int mod) {
     char newickTreeC[newickTree.size()+1];
     int size,i=0;
     treeSize=1;leafNumber=0;
@@ -20,7 +24,8 @@ parser::parser(string newickTree, int mod) {
     this->depth++;
     return;
 }
-void parser::parseOne(char *newick, int &index, int end, TreeNode &node,int mod) {
+
+void NewickParser::parseOne(char *newick, int &index, int end, TreeNode &node,int mod) {
     if (newick[index]!='(')
         cout<<"Error can't parse newick tree\n maybe you didn't delete annotation of tree?\n";
     //left child name
@@ -79,18 +84,8 @@ void parser::parseOne(char *newick, int &index, int end, TreeNode &node,int mod)
     node.rChild->fDist=node.rDist;
     return;
 }
-/*For traditional newick tree
- void parser::nameTravel(TreeNode &node, int &ID) {
- if(node.lChild!=NULL){
- nameTravel(*(node.lChild), ID);
- nameTravel(*(node.rChild), ID);
- }
- else
- label[node.name]=ID;
- node.id=ID++;
- return;
- }*/
-void parser::nameTravel(TreeNode &node, int &ID) {//SILVA newick tree
+
+void NewickParser::nameTravel(TreeNode &node, int &ID) {//SILVA newick tree
     if(node.lChild!=NULL){
         nameTravel(*(node.lChild), ID);
         nameTravel(*(node.rChild), ID);
@@ -158,7 +153,7 @@ void parser::nameTravel(TreeNode &node, int &ID) {//SILVA newick tree
     }node.id=ID++;
     return;
 }
-void parser::genTable(TreeNode &node,int const depth){
+void NewickParser::genTable(TreeNode &node,int const depth){
     node.dep=depth;
     if(node.lChild!=NULL){
         genTable(*(node.lChild),depth+1);
@@ -184,7 +179,7 @@ void parser::genTable(TreeNode &node,int const depth){
         table[node.id].bid=node.father->rChild->id;
     
 }
-int parser::orderTravel(TreeNode& node,int &step,unordered_map<int, int>& REG){
+int NewickParser::orderTravel(TreeNode& node,int &step,unordered_map<int, int>& REG){
     int leftID,rightID;
     if(node.lChild->lChild!=NULL) leftID=orderTravel(*(node.lChild),step,REG);
     else leftID=node.lChild->id;
@@ -212,7 +207,7 @@ int parser::orderTravel(TreeNode& node,int &step,unordered_map<int, int>& REG){
         REG.erase(REG.find(rightID+depth));
     return node.id;
 }
-void parser::genCompData(){
+void NewickParser::genCompData(){
     compData.order_1=new int[leafNumber];
     compData.order_2=new int[leafNumber];
     compData.order_N=new int[leafNumber];
@@ -222,7 +217,7 @@ void parser::genCompData(){
     unordered_map<int, int> REG;
     orderTravel(tree,i,REG);
 }
-void parser::printCompData(ofstream &ofile){
+void NewickParser::printCompData(ofstream &ofile){
     for (int i=0;i<leafNumber-1;i++){
         ofile<<compData.order_1[i]<<'\t';
         ofile<<compData.dist_1[i]<<'\t';
@@ -231,14 +226,13 @@ void parser::printCompData(ofstream &ofile){
         ofile<<compData.order_N[i]<<'\n';
     }
 }
-void parser::printWalk(TreeNode *A, ofstream &ofile){
+void NewickParser::printWalk(TreeNode *A, ofstream &ofile){
     bool flag=false;
     if(A->lChild!=NULL){
         if(A->name.length()>2){
             flag=true;
             ofile<<'(';
         }
-            
         ofile<<'(';
         printWalk(A->lChild, ofile);
         ofile<<',';
@@ -253,7 +247,7 @@ void parser::printWalk(TreeNode *A, ofstream &ofile){
     ofile<<':'<<A->fDist;
     return;
 }
-int parser::printTree(ofstream &ofile){
+int NewickParser::printTree(ofstream &ofile){
     auto pointer=tree;
     printWalk(&tree, ofile);
     return 0;
